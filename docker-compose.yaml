@@ -1,0 +1,40 @@
+version: '3'
+services:
+#  service:
+##    restart: always
+#    build: .
+#    container_name: douyin-service
+#    depends_on:
+#      mysql:
+#        condition: service_healthy
+#    ports:
+#      - "1897:1897"
+  mysql:
+    restart: unless-stopped
+    image: mysql:8.0.27
+    container_name: douyin-mysql
+    volumes:
+#      - ./database:/var/lib/mysql
+      - ./mysql.cnf:/etc/my.cnf
+    environment:
+      - "MYSQL_ROOT_PASSWORD=123456"
+      - "MYSQL_DATABASE=douyin"
+      - "TZ=Asia/Shanghai"
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: "mysqladmin ping -h localhost"
+      timeout: 1s
+      retries: 20
+      interval: 1s
+  redis:
+    image: 'redis:6.0'
+    restart: always
+    container_name: docker_redis
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command:
+      redis-server /usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
