@@ -2,9 +2,9 @@
 
 参考go-clean-arch(https://github.com/bxcodec/go-clean-arch)，以及第四课（https://juejin.cn/course/bytetech/7140987981803814919/section/7141273296397402148）
 
-![clean-arch-1](pic\clean-arch-1.png)
+![clean-arch-1](pic/clean-arch-1.png)
 
-![image-20230128155852372](pic\image-20230128155852372.png)
+![image-20230128155852372](pic/image-20230128155852372.png)
 
 ```
 ./src
