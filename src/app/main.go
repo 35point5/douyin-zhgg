@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	_basicDelivery "douyin-service/basic/delivery/http"
 	"douyin-service/basic/delivery/http/middleware"
 	_basicRepo "douyin-service/basic/repository/mysql"
 	_basicUC "douyin-service/basic/usecase"
 	"fmt"
+	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
@@ -58,6 +60,9 @@ func main() {
 	domainName := viper.GetString("listen")
 	fmt.Println(domainName)
 	h := server.Default(server.WithHostPorts(domainName))
+	h.Use(func(c context.Context, ctx *app.RequestContext) {
+		log.Println("[DEBUG]", string(ctx.Method()), ctx.URI())
+	})
 	middle := middleware.DouyinMiddleware{}
 	_basicDelivery.NewBasicHandler(h, basicUC, &middle)
 	_basicDelivery.NewInteractHandler(h, interactUC, &middle)

@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 	"log"
-	"time"
 )
 
 type mysqlInteractRepository struct {
@@ -19,10 +18,10 @@ func NewMysqlInteractRepository(conn *gorm.DB, debug bool) domain.InteractReposi
 	}
 
 	if debug {
-		conn.Save(&domain.FavoriteListModel{1, 2, 1, time.Now()})
-		conn.Save(&domain.FavoriteListModel{1, 3, 1, time.Now()})
-		conn.Save(&domain.FavoriteListModel{1, 2, 1, time.Now()})
-		conn.Save(&domain.FavoriteListModel{3, 3, 1, time.Now()})
+		conn.Save(&domain.FavoriteListModel{UserID: 1, VideoID: 2, Status: 1})
+		conn.Save(&domain.FavoriteListModel{UserID: 1, VideoID: 3, Status: 1})
+		conn.Save(&domain.FavoriteListModel{UserID: 1, VideoID: 2, Status: 1})
+		conn.Save(&domain.FavoriteListModel{UserID: 3, VideoID: 3, Status: 1})
 	}
 	return &mysqlInteractRepository{conn}
 }
@@ -52,7 +51,7 @@ func (m *mysqlInteractRepository) GetFavoriteListByUserId(id int64) ([]domain.Fa
 		return res, judgeRes.Error
 	}
 	videoCount := viper.GetInt("video_limit")
-	judgeRes = m.Mysql.Where("user_id = ?", id).Order("updated_time desc").Limit(videoCount).Find(&res)
+	judgeRes = m.Mysql.Where("user_id = ?", id).Limit(videoCount).Find(&res)
 	if errors.Is(judgeRes.Error, gorm.ErrRecordNotFound) {
 		return res, errors.New("favorite list is null !")
 	} else if judgeRes.Error != nil {
@@ -63,15 +62,17 @@ func (m *mysqlInteractRepository) GetFavoriteListByUserId(id int64) ([]domain.Fa
 
 func (m *mysqlInteractRepository) FavoriteActionByUserId(user_id int64, video_id int64, action_type int32) (bool, error) {
 
-	var flm domain.FavoriteListModel
+	flm := domain.FavoriteListModel{
+		UserID:  user_id,
+		VideoID: video_id,
+		Status:  1,
+	}
 	if user_id == 0 {
 		return false, errors.New("user_id is zero !")
 	}
-	flm.VideoID = video_id
-	flm.UserID = user_id
 	if action_type == 1 {
 		flm.Status = 1
-		ret := m.Mysql.Create(&flm)
+		ret := m.Mysql.Save(&flm)
 		if ret.Error != nil {
 			return false, ret.Error
 		}

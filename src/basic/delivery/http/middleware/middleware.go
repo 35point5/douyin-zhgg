@@ -32,10 +32,13 @@ func (m *DouyinMiddleware) TokenAuth() app.HandlerFunc {
 	return keyauth.New(
 		keyauth.WithKeyLookUp("query:token", "Bearer"),
 		keyauth.WithValidator(func(ctx context.Context, c *app.RequestContext, s string) (bool, error) {
+			//log.Println("request uri: ", c.URI())
 			claim, err := validateToken(s)
 			if err != nil {
+				fmt.Println("token解析失败")
 				return false, nil
 			}
+			fmt.Println("claim:", claim)
 			if claim.ExpiresAt < time.Now().Unix() {
 				return false, nil
 			}

@@ -6,8 +6,6 @@ import (
 	"douyin-service/domain"
 	"fmt"
 	"github.com/cloudwego/hertz/pkg/app/server"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/spf13/viper"
 	"log"
 	"net/http"
 )
@@ -19,10 +17,10 @@ type InteractHandler struct {
 
 func NewInteractHandler(h *server.Hertz, IUsecase domain.InteractUsecase, mid *middleware.DouyinMiddleware) {
 	handler := InteractHandler{IUsecase}
-	h.GET("/douyin/favorite/list", handler.GetFavoriteListByUserId)
-	h.POST("/douyin/favorite/action", handler.FavoriteAction)
-	authGroup := h.Group("/douyin")
+	authGroup := h.Group("/douyin/")
 	authGroup.Use(mid.TokenAuth())
+	authGroup.POST("/favorite/action/", handler.FavoriteAction)
+	authGroup.GET("/favorite/list/", handler.GetFavoriteListByUserId)
 }
 
 func (t *InteractHandler) GetFavoriteListByUserId(ctx context.Context, c *app.RequestContext) {
@@ -47,7 +45,7 @@ func (t *InteractHandler) GetFavoriteListByUserId(ctx context.Context, c *app.Re
 		})
 		return
 	}
-	fmt.Println(videos)
+	log.Println("fav videos:", videos)
 	c.JSON(http.StatusOK, domain.FavoriteListResponse{
 		Response: domain.Response{
 			StatusCode: 0,
@@ -70,21 +68,22 @@ func (t *InteractHandler) FavoriteAction(ctx context.Context, c *app.RequestCont
 		return
 	}
 	fmt.Println(r.VideoId)
-	validateToken := func(token string) (*domain.TokenClaims, error) {
-		key := viper.GetString("jwt_key")
-		var c domain.TokenClaims
-		_, err := jwt.ParseWithClaims(token, &c, func(token *jwt.Token) (interface{}, error) {
-			return []byte(key), nil
-		})
-		fmt.Println(c)
-		if err != nil {
-			return nil, err
-		}
-		return &c, nil
-	}
-
-	userClaim, _ := validateToken(r.Token)
-	videoBool, err := t.IUsecase.FavoriteActionByUserId(userClaim.Id, r.VideoId, r.ActionType)
+	//validateToken := func(token string) (*domain.TokenClaims, error) {
+	//	key := viper.GetString("jwt_key")
+	//	var c domain.TokenClaims
+	//	_, err := jwt.ParseWithClaims(token, &c, func(token *jwt.Token) (interface{}, error) {
+	//		return []byte(key), nil
+	//	})
+	//	fmt.Println(c)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	return &c, nil
+	//}
+	//
+	//userClaim, _ := validateToken(r.Token)
+	uid, _ := c.Get("uid")
+	videoBool, err := t.IUsecase.FavoriteActionByUserId(uid.(int64), r.VideoId, r.ActionType)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusOK, domain.Response{

@@ -49,6 +49,7 @@ func (u *basicUsecase) UserRegister(user domain.UserRegisterRequest) (int64, err
 }
 
 func (u *basicUsecase) UserRequest(userauth domain.UserAuth) domain.UserModel {
+	//log.Println("user_req id", userauth.Id)
 	return u.basicRepo.GetUserById(userauth.Id)
 }
 

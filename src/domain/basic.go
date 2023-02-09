@@ -57,8 +57,8 @@ type UserRegisterRequest struct {
 }
 
 type UserAuth struct {
-	Id    int64  `query:"userid"`
-	Token string `query:"token"`
+	Id    int64  `query:"user_id" json:"user_id"`
+	Token string `query:"token" json:"token"`
 }
 
 type TokenClaims struct {
@@ -73,7 +73,7 @@ type UserRegisterResponse struct {
 
 type UserRequesetResponse struct {
 	Response
-	UserModel
+	User UserModel `json:"user"`
 }
 
 type BasicRepository interface {
@@ -99,14 +99,14 @@ type FavoriteListRequest struct {
 
 type FavoriteListResponse struct {
 	Response
-	VideoList []Video
+	VideoList []Video `json:"video_list"`
 }
 
 type FavoriteListModel struct {
-	UserID      int64  `gorm:"primaryKey;autoIncrement:false"`
-	VideoID     int64  `gorm:"primaryKey;autoIncrement:false"`
-	Status      uint32 `json:"status" gorm:"default:1"` //记录是否有效
-	UpdatedTime time.Time
+	UserID  int64  `gorm:"primaryKey;autoIncrement:false"`
+	VideoID int64  `gorm:"primaryKey;autoIncrement:false"`
+	Status  uint32 `json:"status" gorm:"default:1"` //记录是否有效
+	//CreatedAt time.Time
 }
 
 type InteractRepository interface {

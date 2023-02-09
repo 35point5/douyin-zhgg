@@ -23,7 +23,7 @@ func NewMysqlBasicRepository(conn *gorm.DB, debug bool) domain.BasicRepository {
 		staticURL := viper.GetString("static_url")
 		conn.Create(&domain.VideoModel{
 			Id:            0,
-			Uid:           5,
+			Uid:           24,
 			PlayUrl:       domainName + staticURL + "/bear.mp4",
 			CoverUrl:      domainName + staticURL + "/cover.jpg",
 			FavoriteCount: 0,
@@ -38,14 +38,14 @@ func NewMysqlBasicRepository(conn *gorm.DB, debug bool) domain.BasicRepository {
 func (m *mysqlBasicRepository) GetVideoByTime(t time.Time) []domain.VideoModel {
 	var res []domain.VideoModel
 	videoCount := viper.GetInt("video_limit")
-	m.Mysql.Where("updated_time < ?", t).Order("updated_time desc").Limit(videoCount).Find(&res)
+	m.Mysql.Where("updated_time <= ?", t).Order("updated_time desc").Limit(videoCount).Find(&res)
 	return res
 }
 
 func (m *mysqlBasicRepository) GetUserById(id int64) domain.UserModel {
 	var res domain.UserModel
 	res.Id = id
-	m.Mysql.First(&res)
+	m.Mysql.First(&res, id)
 	return res
 }
 

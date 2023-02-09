@@ -26,12 +26,12 @@ func NewBasicHandler(h *server.Hertz, BUsecase domain.BasicUsecase, mid *middlew
 	staticPath := viper.GetString("static_path")
 	h.Static("/douyin/static/", staticPath)
 	h.GET("/douyin/feed", handler.GetVideoByTime)
-	h.POST("/douyin/user/register", handler.UserRegister)
-	h.POST("/douyin/user/login", handler.UserLogin)
-	authGroup := h.Group("/douyin")
+	h.POST("/douyin/user/register/", handler.UserRegister)
+	h.POST("/douyin/user/login/", handler.UserLogin)
+	authGroup := h.Group("/douyin/")
 	authGroup.Use(mid.TokenAuth())
-	authGroup.GET("/ping", ping)
-	authGroup.GET("/user", handler.UserRequest)
+	authGroup.GET("/ping/", ping)
+	authGroup.GET("/user/", handler.UserRequest)
 }
 
 func ping(ctx context.Context, c *app.RequestContext) {
@@ -51,7 +51,7 @@ func (t *BasicHandler) GetVideoByTime(ctx context.Context, c *app.RequestContext
 		})
 		return
 	}
-	videos, lastTime := t.BUsecase.GetVideoByTime(time.Unix(r.LatestTime/1000, 0))
+	videos, lastTime := t.BUsecase.GetVideoByTime(time.Unix(r.LatestTime/1000+1, 0))
 	fmt.Println(videos)
 	c.JSON(http.StatusOK, domain.FeedResponse{
 		Response: domain.Response{
@@ -130,12 +130,13 @@ func (t *BasicHandler) UserRequest(ctx context.Context, c *app.RequestContext) {
 	}
 	log.Println(r)
 	user := t.BUsecase.UserRequest(r)
+	fmt.Println("user_req", user)
 	c.JSON(http.StatusOK, domain.UserRequesetResponse{
 		Response: domain.Response{
 			StatusCode: 0,
 			StatusMsg:  "OK",
 		},
-		UserModel: user,
+		User: user,
 	})
 }
 
