@@ -136,7 +136,13 @@ func (t *BasicHandler) UserRequest(ctx context.Context, c *app.RequestContext) {
 			StatusCode: 0,
 			StatusMsg:  "OK",
 		},
-		User: user,
+		User: domain.User{
+			Id:            user.Id,
+			Name:          user.Name,
+			FollowCount:   user.FollowCount,
+			FollowerCount: user.FollowerCount,
+			IsFollow:      user.IsFollow,
+		},
 	})
 }
 
@@ -152,6 +158,14 @@ func (t *BasicHandler) UserLogin(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	user := t.BUsecase.UserLogin(r)
+	if r.Password != user.Password {
+		log.Println("Password Wrong")
+		c.JSON(http.StatusOK, domain.Response{
+			StatusCode: 1,
+			StatusMsg:  "密码输入错误",
+		})
+		return
+	}
 	uid := user.Id
 	domainName := viper.GetString("domain")
 	token, err := generateToken(domain.TokenClaims{

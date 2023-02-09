@@ -44,7 +44,6 @@ func (m *mysqlBasicRepository) GetVideoByTime(t time.Time) []domain.VideoModel {
 
 func (m *mysqlBasicRepository) GetUserById(id int64) domain.UserModel {
 	var res domain.UserModel
-	res.Id = id
 	m.Mysql.First(&res, id)
 	return res
 }

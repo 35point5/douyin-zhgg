@@ -30,6 +30,15 @@ type VideoModel struct {
 type UserModel struct {
 	Id            int64  `json:"id,omitempty"`
 	Name          string `json:"name,omitempty" gorm:"unique"`
+	Password      string `json:"password,omitempty"`
+	FollowCount   int64  `json:"follow_count,omitempty"`
+	FollowerCount int64  `json:"follower_count,omitempty"`
+	IsFollow      bool   `json:"is_follow,omitempty"`
+}
+
+type User struct {
+	Id            int64  `json:"id,omitempty"`
+	Name          string `json:"name,omitempty" gorm:"unique"`
 	FollowCount   int64  `json:"follow_count,omitempty"`
 	FollowerCount int64  `json:"follower_count,omitempty"`
 	IsFollow      bool   `json:"is_follow,omitempty"`
@@ -73,7 +82,7 @@ type UserRegisterResponse struct {
 
 type UserRequesetResponse struct {
 	Response
-	User UserModel `json:"user"`
+	User User `json:"user"`
 }
 
 type BasicRepository interface {

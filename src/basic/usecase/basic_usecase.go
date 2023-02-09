@@ -38,6 +38,7 @@ func (u *basicUsecase) UserRegister(user domain.UserRegisterRequest) (int64, err
 	uid, err := u.basicRepo.CreateUser(domain.UserModel{
 		Id:            0,
 		Name:          user.Username,
+		Password:      user.Password,
 		FollowCount:   0,
 		FollowerCount: 0,
 		IsFollow:      false,
