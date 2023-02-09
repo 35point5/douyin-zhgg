@@ -75,10 +75,12 @@ type UserRequesetResponse struct {
 	Response
 	UserModel
 }
+
 type BasicRepository interface {
 	GetVideoByTime(t time.Time) []VideoModel
 	//SetToken(uid int64, token string) error
 	GetUserById(id int64) UserModel
+	GetUserByName(name string) UserModel
 	CreateUser(user UserModel) (int64, error)
 	//UserRegister(user UserRegisterRequest) (UserModel, string)
 }
@@ -87,4 +89,5 @@ type BasicUsecase interface {
 	GetVideoByTime(t time.Time) ([]Video, time.Time)
 	UserRegister(user UserRegisterRequest) (int64, error)
 	UserRequest(userauth UserAuth) UserModel
+	UserLogin(user UserRegisterRequest) UserModel
 }

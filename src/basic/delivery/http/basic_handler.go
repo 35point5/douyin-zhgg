@@ -27,10 +27,11 @@ func NewBasicHandler(h *server.Hertz, BUsecase domain.BasicUsecase, mid *middlew
 	h.Static("/douyin/static/", staticPath)
 	h.GET("/douyin/feed", handler.GetVideoByTime)
 	h.POST("/douyin/user/register", handler.UserRegister)
+	h.POST("/douyin/user/login", handler.UserLogin)
 	authGroup := h.Group("/douyin")
 	authGroup.Use(mid.TokenAuth())
 	authGroup.GET("/ping", ping)
-	authGroup.GET("/user/", handler.UserRequest)
+	authGroup.GET("/user", handler.UserRequest)
 }
 
 func ping(ctx context.Context, c *app.RequestContext) {
@@ -135,5 +136,46 @@ func (t *BasicHandler) UserRequest(ctx context.Context, c *app.RequestContext) {
 			StatusMsg:  "OK",
 		},
 		UserModel: user,
+	})
+}
+
+func (t *BasicHandler) UserLogin(ctx context.Context, c *app.RequestContext) {
+	var r domain.UserRegisterRequest
+	err := c.Bind(&r)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusOK, domain.Response{
+			StatusCode: 1,
+			StatusMsg:  "系统错误，获取参数失败",
+		})
+		return
+	}
+	user := t.BUsecase.UserLogin(r)
+	uid := user.Id
+	domainName := viper.GetString("domain")
+	token, err := generateToken(domain.TokenClaims{
+		Id: uid,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour).Unix(),
+			Issuer:    domainName,
+		},
+	})
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusOK, domain.Response{
+			StatusCode: 1,
+			StatusMsg:  "系统错误，创建token失败",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, domain.UserRegisterResponse{
+		Response: domain.Response{
+			StatusCode: 0,
+			StatusMsg:  "OK",
+		},
+		UserAuth: domain.UserAuth{
+			Id:    uid,
+			Token: token,
+		},
 	})
 }

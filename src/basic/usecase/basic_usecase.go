@@ -51,3 +51,7 @@ func (u *basicUsecase) UserRegister(user domain.UserRegisterRequest) (int64, err
 func (u *basicUsecase) UserRequest(userauth domain.UserAuth) domain.UserModel {
 	return u.basicRepo.GetUserById(userauth.Id)
 }
+
+func (u *basicUsecase) UserLogin(user domain.UserRegisterRequest) domain.UserModel {
+	return u.basicRepo.GetUserByName(user.Username)
+}

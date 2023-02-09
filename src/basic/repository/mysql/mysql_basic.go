@@ -2,10 +2,11 @@ package mysql
 
 import (
 	"douyin-service/domain"
-	"github.com/spf13/viper"
-	"gorm.io/gorm"
 	"log"
 	"time"
+
+	"github.com/spf13/viper"
+	"gorm.io/gorm"
 )
 
 type mysqlBasicRepository struct {
@@ -45,6 +46,12 @@ func (m *mysqlBasicRepository) GetUserById(id int64) domain.UserModel {
 	var res domain.UserModel
 	res.Id = id
 	m.Mysql.First(&res)
+	return res
+}
+
+func (m *mysqlBasicRepository) GetUserByName(name string) domain.UserModel {
+	var res domain.UserModel
+	m.Mysql.Where("name = ?", name).First(&res)
 	return res
 }
 
