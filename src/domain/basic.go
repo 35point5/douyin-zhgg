@@ -1,8 +1,9 @@
 package domain
 
 import (
-	"github.com/dgrijalva/jwt-go"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 type Video struct {
@@ -56,8 +57,8 @@ type UserRegisterRequest struct {
 }
 
 type UserAuth struct {
-	Id    int64
-	Token string
+	Id    int64  `query:"userid"`
+	Token string `query:"token"`
 }
 
 type TokenClaims struct {
@@ -70,6 +71,10 @@ type UserRegisterResponse struct {
 	UserAuth
 }
 
+type UserRequesetResponse struct {
+	Response
+	UserModel
+}
 type BasicRepository interface {
 	GetVideoByTime(t time.Time) []VideoModel
 	//SetToken(uid int64, token string) error
@@ -81,4 +86,5 @@ type BasicRepository interface {
 type BasicUsecase interface {
 	GetVideoByTime(t time.Time) ([]Video, time.Time)
 	UserRegister(user UserRegisterRequest) (int64, error)
+	UserRequest(userauth UserAuth) UserModel
 }

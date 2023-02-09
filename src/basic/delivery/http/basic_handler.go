@@ -5,15 +5,16 @@ import (
 	"douyin-service/basic/delivery/http/middleware"
 	"douyin-service/domain"
 	"fmt"
+	"log"
+	"net/http"
+	"time"
+
+	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/spf13/viper"
-	"log"
-	"net/http"
-	"time"
 )
-import "github.com/cloudwego/hertz/pkg/app"
 
 type BasicHandler struct {
 	BUsecase domain.BasicUsecase
@@ -29,6 +30,7 @@ func NewBasicHandler(h *server.Hertz, BUsecase domain.BasicUsecase, mid *middlew
 	authGroup := h.Group("/douyin")
 	authGroup.Use(mid.TokenAuth())
 	authGroup.GET("/ping", ping)
+	authGroup.GET("/user/", handler.UserRequest)
 }
 
 func ping(ctx context.Context, c *app.RequestContext) {
@@ -111,5 +113,27 @@ func (t *BasicHandler) UserRegister(ctx context.Context, c *app.RequestContext) 
 			Id:    uid,
 			Token: token,
 		},
+	})
+}
+
+func (t *BasicHandler) UserRequest(ctx context.Context, c *app.RequestContext) {
+	var r domain.UserAuth
+	err := c.Bind(&r)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusOK, domain.Response{
+			StatusCode: 1,
+			StatusMsg:  "系统错误，获取参数失败",
+		})
+		return
+	}
+	log.Println(r)
+	user := t.BUsecase.UserRequest(r)
+	c.JSON(http.StatusOK, domain.UserRequesetResponse{
+		Response: domain.Response{
+			StatusCode: 0,
+			StatusMsg:  "OK",
+		},
+		UserModel: user,
 	})
 }
