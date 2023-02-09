@@ -91,3 +91,41 @@ type BasicUsecase interface {
 	UserRequest(userauth UserAuth) UserModel
 	UserLogin(user UserRegisterRequest) UserModel
 }
+
+type FavoriteListRequest struct {
+	UserId int64  `query:"user_id"` // 用户id
+	Token  string // 用户鉴权token
+}
+
+type FavoriteListResponse struct {
+	Response
+	VideoList []Video
+}
+
+type FavoriteListModel struct {
+	UserID      int64  `gorm:"primaryKey;autoIncrement:false"`
+	VideoID     int64  `gorm:"primaryKey;autoIncrement:false"`
+	Status      uint32 `json:"status" gorm:"default:1"` //记录是否有效
+	UpdatedTime time.Time
+}
+
+type InteractRepository interface {
+	GetVideoModelsById(id []int64) ([]VideoModel, error)
+	GetFavoriteListByUserId(id int64) ([]FavoriteListModel, error)
+	FavoriteActionByUserId(user_id int64, video_id int64, action_type int32) (bool, error)
+}
+
+type InteractUsecase interface {
+	GetFavoriteListByUserId(id int64) ([]Video, error)
+	FavoriteActionByUserId(user_id int64, video_id int64, action_type int32) (bool, error)
+}
+
+type FavoriteActionRequest struct {
+	Token      string `query:"token"`       // 用户鉴权token
+	VideoId    int64  `query:"video_id"`    // 视频id
+	ActionType int32  `query:"action_type"` // 1-点赞，2-取消点赞
+}
+
+type FavoriteActionResponse struct {
+	Response
+}

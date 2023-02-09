@@ -52,10 +52,14 @@ func main() {
 	//}
 	debug = viper.GetBool("debug")
 	basicRepo := _basicRepo.NewMysqlBasicRepository(db, debug)
+	interactRepo := _basicRepo.NewMysqlInteractRepository(db, debug)
 	basicUC := _basicUC.NewBasicUsecase(basicRepo)
+	interactUC := _basicUC.NewInteractUsecase(basicRepo, interactRepo)
 	domainName := viper.GetString("listen")
+	fmt.Println(domainName)
 	h := server.Default(server.WithHostPorts(domainName))
 	middle := middleware.DouyinMiddleware{}
 	_basicDelivery.NewBasicHandler(h, basicUC, &middle)
+	_basicDelivery.NewInteractHandler(h, interactUC, &middle)
 	log.Fatal(h.Run())
 }
