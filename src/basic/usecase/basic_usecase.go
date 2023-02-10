@@ -19,8 +19,14 @@ func (u *basicUsecase) GetVideoByTime(t time.Time) ([]domain.Video, time.Time) {
 	for _, vm := range vms {
 		user := u.basicRepo.GetUserById(vm.Uid)
 		res = append(res, domain.Video{
-			Id:            vm.Id,
-			Author:        user,
+			Id: vm.Id,
+			Author: domain.User{
+				Id:            user.Id,
+				Name:          user.Name,
+				FollowCount:   user.FollowCount,
+				FollowerCount: user.FollowerCount,
+				IsFollow:      false, // TODO 这个应该从数据库里面去查
+			},
 			PlayUrl:       vm.PlayUrl,
 			CoverUrl:      vm.CoverUrl,
 			FavoriteCount: vm.FavoriteCount,

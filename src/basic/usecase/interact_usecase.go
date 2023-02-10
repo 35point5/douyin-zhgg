@@ -30,8 +30,14 @@ func (u *interactUsecase) GetFavoriteListByUserId(id int64) ([]domain.Video, err
 	for _, vm := range vms {
 		user := u.basicRepo.GetUserById(vm.Uid)
 		res = append(res, domain.Video{
-			Id:            vm.Id,
-			Author:        user,
+			Id: vm.Id,
+			Author: domain.User{
+				Id:            user.Id,
+				Name:          user.Name,
+				FollowCount:   user.FollowCount,
+				FollowerCount: user.FollowerCount,
+				IsFollow:      false, // TODO 应该去从数据库查
+			},
 			PlayUrl:       vm.PlayUrl,
 			CoverUrl:      vm.CoverUrl,
 			FavoriteCount: vm.FavoriteCount,

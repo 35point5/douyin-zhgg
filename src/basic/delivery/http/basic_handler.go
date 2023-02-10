@@ -23,8 +23,6 @@ type BasicHandler struct {
 func NewBasicHandler(h *server.Hertz, BUsecase domain.BasicUsecase, mid *middleware.DouyinMiddleware) {
 	handler := BasicHandler{BUsecase}
 	//staticURL := viper.GetString("static_url")
-	staticPath := viper.GetString("static_path")
-	h.Static("/douyin/static/", staticPath)
 	h.GET("/douyin/feed", handler.GetVideoByTime)
 	h.POST("/douyin/user/register/", handler.UserRegister)
 	h.POST("/douyin/user/login/", handler.UserLogin)

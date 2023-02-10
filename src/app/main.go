@@ -55,6 +55,7 @@ func main() {
 	debug = viper.GetBool("debug")
 	basicRepo := _basicRepo.NewMysqlBasicRepository(db, debug)
 	interactRepo := _basicRepo.NewMysqlInteractRepository(db, debug)
+	publishRepo := _basicRepo.NewMysqlPublishRepository(db, debug)
 	basicUC := _basicUC.NewBasicUsecase(basicRepo)
 	interactUC := _basicUC.NewInteractUsecase(basicRepo, interactRepo)
 	domainName := viper.GetString("listen")
@@ -63,8 +64,11 @@ func main() {
 	h.Use(func(c context.Context, ctx *app.RequestContext) {
 		log.Println("[DEBUG]", string(ctx.Method()), ctx.URI())
 	})
+	staticPath := viper.GetString("static_path")
+	h.Static("/douyin/static/", staticPath)
 	middle := middleware.DouyinMiddleware{}
 	_basicDelivery.NewBasicHandler(h, basicUC, &middle)
 	_basicDelivery.NewInteractHandler(h, interactUC, &middle)
+	_basicDelivery.NewPublishHandler(h, publishRepo, basicRepo, &middle)
 	log.Fatal(h.Run())
 }

@@ -28,7 +28,6 @@ func NewMysqlBasicRepository(conn *gorm.DB, debug bool) domain.BasicRepository {
 			CoverUrl:      domainName + staticURL + "/cover.jpg",
 			FavoriteCount: 0,
 			CommentCount:  0,
-			IsFavorite:    false,
 			UpdatedTime:   time.Now(),
 		})
 	}

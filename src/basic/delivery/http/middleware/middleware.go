@@ -31,6 +31,9 @@ func validateToken(token string) (*domain.TokenClaims, error) {
 func (m *DouyinMiddleware) TokenAuth() app.HandlerFunc {
 	return keyauth.New(
 		keyauth.WithKeyLookUp("query:token", "Bearer"),
+		keyauth.WithKeyLookUp("header: Authorization", "Bearer"),
+		keyauth.WithKeyLookUp("cookie: jwt", "Bearer"),
+		keyauth.WithKeyLookUp("form: token", "Bearer"),
 		keyauth.WithValidator(func(ctx context.Context, c *app.RequestContext, s string) (bool, error) {
 			//log.Println("request uri: ", c.URI())
 			claim, err := validateToken(s)
