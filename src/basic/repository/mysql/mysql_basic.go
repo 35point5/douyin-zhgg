@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"douyin-service/domain"
+	"errors"
 	"log"
 	"time"
 
@@ -28,7 +29,6 @@ func NewMysqlBasicRepository(conn *gorm.DB, debug bool) domain.BasicRepository {
 			CoverUrl:      domainName + staticURL + "/cover.jpg",
 			FavoriteCount: 0,
 			CommentCount:  0,
-			IsFavorite:    false,
 			UpdatedTime:   time.Now(),
 		})
 	}
@@ -45,7 +45,59 @@ func (m *mysqlBasicRepository) GetVideoByTime(t time.Time) []domain.VideoModel {
 func (m *mysqlBasicRepository) GetUserById(id int64) domain.UserModel {
 	var res domain.UserModel
 	m.Mysql.First(&res, id)
+	//res.FollowCount = m.GetFollowCnt(id)
+	//res.FollowerCount = m.GetFollowerCnt(id)
 	return res
+}
+
+func (m *mysqlBasicRepository) IsFavorite(uid int64, vid int64) bool {
+	var temp domain.FavoriteListModel
+	res := m.Mysql.Where("user_id = ? and video_id = ?", uid, vid).First(&temp)
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		return false
+	}
+	if temp.Status != 1 {
+		return false
+	}
+	return true
+}
+
+//func (m *mysqlBasicRepository) GetFavoriteCnt(vid int64) int64 {
+//	var temp []domain.FavoriteListModel
+//	res := m.Mysql.Where("video_id = ?", vid).Find(&temp)
+//	return res.RowsAffected
+//}
+
+// IsFollow returns whether id follows fid
+func (m *mysqlBasicRepository) IsFollow(id int64, fid int64) bool {
+	//TODO: 等follow接口实现
+	//temp := domain.UserFollowModel{
+	//	UserId:       id,
+	//	TargetUserId: fid,
+	//}
+	//res := m.Mysql.First(&temp)
+	//if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+	//	return false
+	//}
+	return true
+}
+
+//func (m *mysqlBasicRepository) GetFollowCnt(id int64) int64 {
+//	//var temp []domain.UserFollowModel
+//	//res := m.Mysql.Where("user_id = ?", id).Find(&temp)
+//	//return res.RowsAffected
+//	return 0
+//}
+
+//func (m *mysqlBasicRepository) GetFollowerCnt(id int64) int64 {
+//	//var temp []domain.UserFollowModel
+//	//res := m.Mysql.Where("target_user_id = ?", id).Find(&temp)
+//	//return res.RowsAffected
+//	return 0
+//}
+
+func (m *mysqlBasicRepository) GetCommentCnt() {
+	//TODO: 等comment接口实现
 }
 
 func (m *mysqlBasicRepository) GetUserByName(name string) domain.UserModel {

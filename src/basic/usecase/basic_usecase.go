@@ -13,19 +13,31 @@ func NewBasicUsecase(basicRepo domain.BasicRepository) domain.BasicUsecase {
 	return &basicUsecase{basicRepo}
 }
 
-func (u *basicUsecase) GetVideoByTime(t time.Time) ([]domain.Video, time.Time) {
+// GetUserInfo
+// fid: whether fid follows uid
+func (u *basicUsecase) GetUserInfo(uid int64, fid int64) domain.User {
+	um := u.basicRepo.GetUserById(uid)
+	return domain.User{
+		Id:            uid,
+		Name:          um.Name,
+		FollowCount:   um.FollowCount,
+		FollowerCount: um.FollowerCount,
+		IsFollow:      u.basicRepo.IsFollow(fid, uid),
+	}
+}
+
+func (u *basicUsecase) GetVideoByTime(t time.Time, uid int64) ([]domain.Video, time.Time) {
 	vms := u.basicRepo.GetVideoByTime(t)
 	res := make([]domain.Video, 0, len(vms))
 	for _, vm := range vms {
-		user := u.basicRepo.GetUserById(vm.Uid)
 		res = append(res, domain.Video{
 			Id:            vm.Id,
-			Author:        user,
+			Author:        u.GetUserInfo(vm.Uid, uid),
 			PlayUrl:       vm.PlayUrl,
 			CoverUrl:      vm.CoverUrl,
 			FavoriteCount: vm.FavoriteCount,
 			CommentCount:  vm.CommentCount,
-			IsFavorite:    vm.IsFavorite,
+			IsFavorite:    u.basicRepo.IsFavorite(uid, vm.Id),
 		})
 	}
 	if len(vms) == 0 {
@@ -49,9 +61,9 @@ func (u *basicUsecase) UserRegister(user domain.UserRegisterRequest) (int64, err
 	return uid, nil
 }
 
-func (u *basicUsecase) UserRequest(userauth domain.UserAuth) domain.UserModel {
+func (u *basicUsecase) UserRequest(userauth domain.UserAuth) domain.User {
 	//log.Println("user_req id", userauth.Id)
-	return u.basicRepo.GetUserById(userauth.Id)
+	return u.GetUserInfo(userauth.Id, 0)
 }
 
 func (u *basicUsecase) UserLogin(user domain.UserRegisterRequest) domain.UserModel {
