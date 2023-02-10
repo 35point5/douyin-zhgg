@@ -138,3 +138,65 @@ type FavoriteActionRequest struct {
 type FavoriteActionResponse struct {
 	Response
 }
+
+// 社交功能
+type FollowListModel struct {
+	UserID   int64  `gorm:"primaryKey;autoIncrement:false"`
+	ToUserID int64  `gorm:"primaryKey;autoIncrement:false"`
+	Status   uint32 `json:"status" gorm:"default:0"`
+	// 0 代表 UserID 关注了 ToUserID
+	// 1 代表 UserID 取关了 ToUserID
+	// 2 代表 UserID 和 ToUserID 互相关注
+}
+
+type SocialRepository interface {
+	GetFollowListByUserId(id int64) ([]FollowListModel, error)
+	GetFollowerListByUserId(id int64) ([]FollowListModel, error)
+	GetFriendListByUserId(id int64) ([]FollowListModel, error)
+	FollowActionByUserId(user_id int64, to_user_id int64, action_type int32) (bool, error)
+}
+type SocialUsecase interface {
+	GetFollowListByUserId(id int64) ([]User, error)
+	GetFollowerListByUserId(id int64) ([]User, error)
+	GetFriendListByUserId(id int64) ([]User, error)
+	FollowActionByUserId(user_id int64, to_user_id int64, action_type int32) (bool, error)
+}
+type RelationActionRequest struct {
+	Token      string `query:"token"`
+	ToUserId   int64  `query:"to_user_id"`
+	ActionType int32  `query:"action_type"`
+}
+
+type RelationActionResponse struct {
+	Response
+}
+
+type FollowListRequest struct {
+	UserId int64 `query:"user_id"`
+	Token  string
+}
+
+type FollowListResponse struct {
+	Response
+	UserList []User `json:"user_list"`
+}
+
+type FollowerListRequest struct {
+	UserId int64 `query:"user_id"`
+	Token  string
+}
+
+type FollowerListResponse struct {
+	Response
+	UserList []User `json:"user_list"`
+}
+
+type FriendListRequest struct {
+	UserId int64 `query:"user_id"`
+	Token  string
+}
+
+type FriendListResponse struct {
+	Response
+	UserList []User `json:"user_list"`
+}
