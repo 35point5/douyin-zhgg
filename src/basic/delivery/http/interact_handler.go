@@ -17,10 +17,10 @@ type InteractHandler struct {
 
 func NewInteractHandler(h *server.Hertz, IUsecase domain.InteractUsecase, mid *middleware.DouyinMiddleware) {
 	handler := InteractHandler{IUsecase}
-	authGroup := h.Group("/douyin/")
+	authGroup := h.Group("/douyin/favorite")
 	authGroup.Use(mid.TokenAuth())
-	authGroup.POST("/favorite/action/", handler.FavoriteAction)
-	authGroup.GET("/favorite/list/", handler.GetFavoriteListByUserId)
+	authGroup.POST("/action/", handler.FavoriteAction)
+	authGroup.GET("/list/", handler.GetFavoriteListByUserId)
 }
 
 func (t *InteractHandler) GetFavoriteListByUserId(ctx context.Context, c *app.RequestContext) {

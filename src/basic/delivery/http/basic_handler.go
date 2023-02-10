@@ -23,13 +23,16 @@ type BasicHandler struct {
 func NewBasicHandler(h *server.Hertz, BUsecase domain.BasicUsecase, mid *middleware.DouyinMiddleware) {
 	handler := BasicHandler{BUsecase}
 	//staticURL := viper.GetString("static_url")
+	// 这三个不用Token验证
 	h.GET("/douyin/feed", handler.GetVideoByTime)
 	h.POST("/douyin/user/register/", handler.UserRegister)
 	h.POST("/douyin/user/login/", handler.UserLogin)
-	authGroup := h.Group("/douyin/")
-	authGroup.Use(mid.TokenAuth())
-	authGroup.GET("/ping/", ping)
-	authGroup.GET("/user/", handler.UserRequest)
+	//authGroup := h.Group("/douyin/")
+	//authGroup.Use(mid.TokenAuth())
+	//authGroup.GET("/ping/", ping)
+	//authGroup.GET("/user/", handler.UserRequest)
+	//这需要Token验证
+	h.GET("/douyin/user/", mid.TokenAuth(), handler.UserRequest)
 }
 
 func ping(ctx context.Context, c *app.RequestContext) {

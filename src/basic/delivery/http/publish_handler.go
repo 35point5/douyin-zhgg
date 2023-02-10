@@ -28,10 +28,10 @@ type PublishHandler struct {
 
 func NewPublishHandler(h *server.Hertz, r domain.PublishRepository, basicR domain.BasicRepository, mid *middleware.DouyinMiddleware) {
 	handler := PublishHandler{r, basicR, viper.GetString("domain"), viper.GetString("static_url"), viper.GetString("static_path")}
-	g := h.Group("/douyin/")
+	g := h.Group("/douyin/publish")
 	g.Use(mid.TokenAuth())
-	g.POST("/publish/action/", handler.Publish)
-	g.GET("/publish/list/", handler.List)
+	g.POST("/action/", handler.Publish)
+	g.GET("/list/", handler.List)
 }
 
 func WriteVideo(DirPath, videoName string, data []byte) error {
