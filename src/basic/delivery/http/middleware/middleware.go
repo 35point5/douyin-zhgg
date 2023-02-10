@@ -30,10 +30,37 @@ func validateToken(token string) (*domain.TokenClaims, error) {
 
 func (m *DouyinMiddleware) TokenAuth() app.HandlerFunc {
 	return keyauth.New(
-		keyauth.WithKeyLookUp("query:token", "Bearer"),
-		keyauth.WithKeyLookUp("header: Authorization", "Bearer"),
-		keyauth.WithKeyLookUp("cookie: jwt", "Bearer"),
-		keyauth.WithKeyLookUp("form: token", "Bearer"),
+		keyauth.WithKeyLookUp("query:token", ""),
+		//keyauth.WithKeyLookUp("header: Authorization", ""),
+		//keyauth.WithKeyLookUp("cookie: jwt", ""),
+		//keyauth.WithKeyLookUp("form: token", ""),
+		keyauth.WithValidator(func(ctx context.Context, c *app.RequestContext, s string) (bool, error) {
+			//log.Println("request uri: ", c.URI())
+			claim, err := validateToken(s)
+			if err != nil {
+				fmt.Println("token解析失败")
+				return false, nil
+			}
+			fmt.Println("claim:", claim)
+			if claim.ExpiresAt < time.Now().Unix() {
+				return false, nil
+			}
+			c.Set("uid", claim.Id)
+			//c.Next(ctx)
+			return true, nil
+		}),
+		keyauth.WithErrorHandler(func(ctx context.Context, c *app.RequestContext, err error) {
+			c.AbortWithStatusJSON(http.StatusOK, domain.Response{
+				StatusCode: 2,
+				StatusMsg:  "认证失败",
+			})
+		}),
+	)
+}
+
+func (m *DouyinMiddleware) TokenAuthPublishAction() app.HandlerFunc {
+	return keyauth.New(
+		keyauth.WithKeyLookUp("form:token", ""),
 		keyauth.WithValidator(func(ctx context.Context, c *app.RequestContext, s string) (bool, error) {
 			//log.Println("request uri: ", c.URI())
 			claim, err := validateToken(s)

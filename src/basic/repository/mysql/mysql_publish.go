@@ -23,7 +23,7 @@ func (m *mysqlPublishRepository) AddVideo(v *domain.VideoModel) error {
 }
 
 func (m *mysqlPublishRepository) LisVideoByUserId(userId int64) (videoList []domain.VideoModel, err error) {
-	ret := m.Mysql.Where("user_id = ?", userId).Find(&videoList)
+	ret := m.Mysql.Where("uid = ?", userId).Find(&videoList)
 	err = ret.Error
 	return
 }

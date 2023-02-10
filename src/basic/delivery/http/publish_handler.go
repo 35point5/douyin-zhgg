@@ -29,9 +29,8 @@ type PublishHandler struct {
 func NewPublishHandler(h *server.Hertz, r domain.PublishRepository, basicR domain.BasicRepository, mid *middleware.DouyinMiddleware) {
 	handler := PublishHandler{r, basicR, viper.GetString("domain"), viper.GetString("static_url"), viper.GetString("static_path")}
 	g := h.Group("/douyin/publish")
-	g.Use(mid.TokenAuth())
-	g.POST("/action/", handler.Publish)
-	g.GET("/list/", handler.List)
+	g.POST("/action/", mid.TokenAuthPublishAction(), handler.Publish)
+	g.GET("/list/", mid.TokenAuth(), handler.List)
 }
 
 func WriteVideo(DirPath, videoName string, data []byte) error {
@@ -89,24 +88,30 @@ func (h *PublishHandler) Publish(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req domain.PublishActionRequest
 	resp := new(domain.PublishActionResponse)
-	err = c.BindAndValidate(&req)
+	err = c.Bind(&req)
 	if err != nil {
+		log.Println(err)
 		resp.StatusCode = 1
+		resp.StatusMsg = "参数错误"
 		c.JSON(consts.StatusOK, resp)
 		return
 	}
-
+	f, _ := req.Data.Open()
+	data := make([]byte, req.Data.Size)
+	f.Read(data)
 	uid, _ := c.Get("uid")
 	userId := uid.(int64)
 	videoName := uuid.New().String() + ".mp4"
-	if err = WriteVideo(h.staticPath, videoName, req.Data); err != nil {
+	if err = WriteVideo(h.staticPath, videoName, data); err != nil {
 		resp.StatusCode = 1
+		resp.StatusMsg = "保存Video失败"
 		c.JSON(consts.StatusOK, resp)
 		return
 	}
 	imageName, err := GetFirstFrame(h.staticPath, videoName, 1)
 	if err != nil {
 		resp.StatusCode = 1
+		resp.StatusMsg = "截取首帧失败"
 		c.JSON(consts.StatusOK, resp)
 		return
 	}
@@ -122,6 +127,7 @@ func (h *PublishHandler) Publish(ctx context.Context, c *app.RequestContext) {
 	}
 	if err = h.r.AddVideo(&vm); err != nil {
 		resp.StatusCode = 1
+		resp.StatusMsg = "插入数据库失败"
 		c.JSON(consts.StatusOK, resp)
 		return
 	}
@@ -136,7 +142,7 @@ func (h *PublishHandler) List(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req domain.PublishListRequest
 	resp := new(domain.PublishListResponse)
-	err = c.BindAndValidate(&req)
+	err = c.Bind(&req)
 	if err != nil {
 		resp.StatusCode = 1
 		c.JSON(consts.StatusOK, resp)
@@ -151,6 +157,7 @@ func (h *PublishHandler) List(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusOK, resp)
 		return
 	}
+	log.Println(vmList)
 	videoList := make([]domain.Video, 0)
 	for _, vm := range vmList {
 		user := h.basicR.GetUserById(vm.Uid)

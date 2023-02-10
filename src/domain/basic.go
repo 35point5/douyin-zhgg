@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"mime/multipart"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -151,23 +152,23 @@ type FavoriteActionResponse struct {
 
 // publish相关接口
 type PublishActionRequest struct {
-	Token string `json:"token,required" form:"token,required" query:"token,required"` // 用户鉴权token
-	Data  []byte `json:"data,required" form:"data,required" query:"data,required"`    // 视频数据
-	Title string `json:"title,required" form:"title,required" query:"title,required"` // 视频标题
+	Token string               `json:"token" form:"token" query:"token"` // 用户鉴权token
+	Data  multipart.FileHeader `json:"data" form:"data" query:"data"`    // 视频数据
+	Title string               `json:"title" form:"title" query:"title"` // 视频标题
 }
 
 type PublishActionResponse struct {
-	StatusCode int32  `json:"status_code,required" form:"status_code,required" query:"status_code,required"` // 状态码，0-成功，其他值-失败
-	StatusMsg  string `json:"status_msg,omitempty" form:"status_msg" query:"status_msg"`                     // 返回状态描述
+	StatusCode int32  `json:"status_code" form:"status_code" query:"status_code"`        // 状态码，0-成功，其他值-失败
+	StatusMsg  string `json:"status_msg,omitempty" form:"status_msg" query:"status_msg"` // 返回状态描述
 }
 type PublishListRequest struct {
-	UserId int64  `json:"user_id,required" form:"user_id,required" query:"user_id,required"` // 用户id
-	Token  string `json:"token,required" form:"token,required" query:"token,required"`       // 用户鉴权token
+	UserId int64  `json:"user_id" form:"user_id" query:"user_id"` // 用户id
+	Token  string `json:"token" form:"token" query:"token"`       // 用户鉴权token
 }
 type PublishListResponse struct {
-	StatusCode int32   `json:"status_code,required" form:"status_code,required" query:"status_code,required"` // 状态码，0-成功，其他值-失败
-	StatusMsg  string  `json:"status_msg,omitempty" form:"status_msg" query:"status_msg"`                     // 返回状态描述
-	VideoList  []Video `json:"video_list" form:"video_list" query:"video_list"`                               // 用户发布的视频列表
+	StatusCode int32   `json:"status_code" form:"status_code" query:"status_code"`        // 状态码，0-成功，其他值-失败
+	StatusMsg  string  `json:"status_msg,omitempty" form:"status_msg" query:"status_msg"` // 返回状态描述
+	VideoList  []Video `json:"video_list" form:"video_list" query:"video_list"`           // 用户发布的视频列表
 }
 
 type PublishRepository interface {
