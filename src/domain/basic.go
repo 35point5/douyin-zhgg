@@ -3,8 +3,6 @@ package domain
 import (
 	"mime/multipart"
 	"time"
-
-	"github.com/dgrijalva/jwt-go"
 )
 
 type VideoModel struct {
@@ -89,8 +87,8 @@ type UserAuth struct {
 }
 
 type TokenClaims struct {
-	Id int64
-	jwt.StandardClaims
+	Uid int64 `json:"uid"`
+	//jwt.StandardClaims
 }
 
 type UserRegisterResponse struct {

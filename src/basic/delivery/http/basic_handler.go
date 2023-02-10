@@ -5,34 +5,32 @@ import (
 	"douyin-service/basic/delivery/http/middleware"
 	"douyin-service/domain"
 	"fmt"
-	"log"
-	"net/http"
-	"time"
-
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/utils"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/spf13/viper"
+	"log"
+	"net/http"
+	"time"
 )
 
 type BasicHandler struct {
 	BUsecase domain.BasicUsecase
+	Mid      *middleware.DouyinMiddleware
 }
 
 func NewBasicHandler(h *server.Hertz, BUsecase domain.BasicUsecase, mid *middleware.DouyinMiddleware) {
-	handler := BasicHandler{BUsecase}
+	handler := BasicHandler{BUsecase, mid}
 	//staticURL := viper.GetString("static_url")
 	// 这三个不用Token验证
 	h.GET("/douyin/feed", handler.GetVideoByTime)
 	h.POST("/douyin/user/register/", handler.UserRegister)
 	h.POST("/douyin/user/login/", handler.UserLogin)
-	//authGroup := h.Group("/douyin/")
-	//authGroup.Use(mid.TokenAuth())
-	//authGroup.GET("/ping/", ping)
-	//authGroup.GET("/user/", handler.UserRequest)
 	//这需要Token验证
-	h.GET("/douyin/user/", mid.TokenAuth(), handler.UserRequest)
+	authGroup := h.Group("/douyin/")
+	authGroup.Use(mid.TokenAuth())
+	authGroup.GET("/ping/", ping)
+	authGroup.GET("/user/", handler.UserRequest)
+	//h.GET("/douyin/user/", mid.TokenAuth(), handler.UserRequest)
 }
 
 func ping(ctx context.Context, c *app.RequestContext) {
@@ -64,10 +62,12 @@ func (t *BasicHandler) GetVideoByTime(ctx context.Context, c *app.RequestContext
 	})
 }
 
-func generateToken(claims domain.TokenClaims) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	key := viper.GetString("jwt_key")
-	return token.SignedString([]byte(key))
+func (t *BasicHandler) generateToken(claims *domain.TokenClaims) (string, error) {
+	str, _, err := t.Mid.JWTMid.TokenGenerator(claims)
+	return str, err
+	//token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	//key := viper.GetString("jwt_key")
+	//return token.SignedString([]byte(key))
 }
 
 func (t *BasicHandler) UserRegister(ctx context.Context, c *app.RequestContext) {
@@ -90,13 +90,9 @@ func (t *BasicHandler) UserRegister(ctx context.Context, c *app.RequestContext) 
 		})
 		return
 	}
-	domainName := viper.GetString("domain")
-	token, err := generateToken(domain.TokenClaims{
-		Id: uid,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour).Unix(),
-			Issuer:    domainName,
-		},
+	//domainName := viper.GetString("domain")
+	token, err := t.generateToken(&domain.TokenClaims{
+		Uid: uid,
 	})
 	if err != nil {
 		log.Println(err)
@@ -168,13 +164,9 @@ func (t *BasicHandler) UserLogin(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	uid := user.Id
-	domainName := viper.GetString("domain")
-	token, err := generateToken(domain.TokenClaims{
-		Id: uid,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour).Unix(),
-			Issuer:    domainName,
-		},
+	//domainName := viper.GetString("domain")
+	token, err := t.generateToken(&domain.TokenClaims{
+		Uid: uid,
 	})
 	if err != nil {
 		log.Println(err)

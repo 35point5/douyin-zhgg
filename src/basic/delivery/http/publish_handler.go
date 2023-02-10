@@ -29,7 +29,7 @@ type PublishHandler struct {
 func NewPublishHandler(h *server.Hertz, r domain.PublishRepository, basicR domain.BasicRepository, mid *middleware.DouyinMiddleware) {
 	handler := PublishHandler{r, basicR, viper.GetString("domain"), viper.GetString("static_url"), viper.GetString("static_path")}
 	g := h.Group("/douyin/publish")
-	g.POST("/action/", mid.TokenAuthPublishAction(), handler.Publish)
+	g.POST("/action/", mid.TokenAuth(), handler.Publish)
 	g.GET("/list/", mid.TokenAuth(), handler.List)
 }
 

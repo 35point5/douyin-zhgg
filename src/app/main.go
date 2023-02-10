@@ -66,9 +66,9 @@ func main() {
 	})
 	staticPath := viper.GetString("static_path")
 	h.Static("/douyin/static/", staticPath)
-	middle := middleware.DouyinMiddleware{}
-	_basicDelivery.NewBasicHandler(h, basicUC, &middle)
-	_basicDelivery.NewInteractHandler(h, interactUC, &middle)
-	_basicDelivery.NewPublishHandler(h, publishRepo, basicRepo, &middle)
+	middle := middleware.New()
+	_basicDelivery.NewBasicHandler(h, basicUC, middle)
+	_basicDelivery.NewInteractHandler(h, interactUC, middle)
+	_basicDelivery.NewPublishHandler(h, publishRepo, basicRepo, middle)
 	log.Fatal(h.Run())
 }
