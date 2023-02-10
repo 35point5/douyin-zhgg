@@ -109,9 +109,10 @@ type BasicRepository interface {
 	CreateUser(user UserModel) (int64, error)
 	//UserRegister(user UserRegisterRequest) (UserModel, string)
 	IsFollow(id int64, fid int64) bool
-	GetFollowCnt(id int64) int64
-	GetFollowerCnt(id int64) int64
+	//GetFollowCnt(id int64) int64
+	//GetFollowerCnt(id int64) int64
 	IsFavorite(uid int64, vid int64) bool
+	//GetFavoriteCnt(vid int64) int64
 }
 
 type BasicUsecase interface {

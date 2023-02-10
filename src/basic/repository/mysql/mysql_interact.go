@@ -67,6 +67,8 @@ func (m *mysqlInteractRepository) FavoriteActionByUserId(user_id int64, video_id
 		VideoID: video_id,
 		Status:  1,
 	}
+	var vm domain.VideoModel
+	m.Mysql.First(&vm, video_id)
 	if user_id == 0 {
 		return false, errors.New("user_id is zero !")
 	}
@@ -76,11 +78,15 @@ func (m *mysqlInteractRepository) FavoriteActionByUserId(user_id int64, video_id
 		if ret.Error != nil {
 			return false, ret.Error
 		}
+		vm.FavoriteCount++
+		m.Mysql.Save(&vm)
 	} else if action_type == 2 {
 		ret := m.Mysql.Delete(&flm)
 		if ret.Error != nil {
 			return false, ret.Error
 		}
+		vm.FavoriteCount--
+		m.Mysql.Save(&vm)
 	} else {
 		return false, errors.New("action_type must be 1 or 2 !")
 	}

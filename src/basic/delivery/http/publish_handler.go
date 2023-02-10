@@ -180,5 +180,6 @@ func (h *PublishHandler) List(ctx context.Context, c *app.RequestContext) {
 
 	resp.StatusCode = 0
 	resp.VideoList = videoList
+	log.Println(resp)
 	c.JSON(consts.StatusOK, resp)
 }

@@ -20,8 +20,8 @@ func (u *basicUsecase) GetUserInfo(uid int64, fid int64) domain.User {
 	return domain.User{
 		Id:            uid,
 		Name:          um.Name,
-		FollowCount:   u.basicRepo.GetFollowCnt(uid),
-		FollowerCount: u.basicRepo.GetFollowerCnt(uid),
+		FollowCount:   um.FollowCount,
+		FollowerCount: um.FollowerCount,
 		IsFollow:      u.basicRepo.IsFollow(fid, uid),
 	}
 }
