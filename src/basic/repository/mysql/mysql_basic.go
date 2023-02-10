@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"douyin-service/domain"
+	"errors"
 	"log"
 	"time"
 
@@ -45,6 +46,48 @@ func (m *mysqlBasicRepository) GetUserById(id int64) domain.UserModel {
 	var res domain.UserModel
 	m.Mysql.First(&res, id)
 	return res
+}
+
+func (m *mysqlBasicRepository) IsFavorite(uid int64, vid int64) bool {
+	var temp domain.FavoriteListModel
+	res := m.Mysql.Where("user_id = ? and video_id = ?", uid, vid).First(&temp)
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		return false
+	}
+	if temp.Status != 1 {
+		return false
+	}
+	return true
+}
+
+// IsFollow returns whether id follows fid
+func (m *mysqlBasicRepository) IsFollow(id int64, fid int64) bool {
+	//TODO: 等follow接口实现
+	//temp := domain.UserFollowModel{
+	//	UserId:       id,
+	//	TargetUserId: fid,
+	//}
+	//res := m.Mysql.First(&temp)
+	//if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+	//	return false
+	//}
+	return true
+}
+
+func (m *mysqlBasicRepository) GetFollowCnt(id int64) int64 {
+	//TODO: 等follow接口实现
+	//var temp []domain.UserFollowModel
+	//res := m.Mysql.Where("user_id = ?", id).Find(&temp)
+	//return res.RowsAffected
+	return 0
+}
+
+func (m *mysqlBasicRepository) GetFollowerCnt(id int64) int64 {
+	//TODO: 等follow接口实现
+	//var temp []domain.UserFollowModel
+	//res := m.Mysql.Where("target_user_id = ?", id).Find(&temp)
+	//return res.RowsAffected
+	return 0
 }
 
 func (m *mysqlBasicRepository) GetUserByName(name string) domain.UserModel {

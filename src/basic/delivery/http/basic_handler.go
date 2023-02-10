@@ -10,6 +10,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/common/utils"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -50,7 +51,13 @@ func (t *BasicHandler) GetVideoByTime(ctx context.Context, c *app.RequestContext
 		})
 		return
 	}
-	videos, lastTime := t.BUsecase.GetVideoByTime(time.Unix(r.LatestTime/1000+1, 0))
+	claims, err := t.Mid.JWTMid.GetClaimsFromJWT(ctx, c)
+	uid := int64(0)
+	if err == nil {
+		uid, _ = strconv.ParseInt(claims["uid"].(string), 10, 64)
+		log.Println("feed uid:", uid)
+	}
+	videos, lastTime := t.BUsecase.GetVideoByTime(time.Unix(r.LatestTime/1000+1, 0), uid)
 	fmt.Println(videos)
 	c.JSON(http.StatusOK, domain.FeedResponse{
 		Response: domain.Response{
@@ -133,13 +140,7 @@ func (t *BasicHandler) UserRequest(ctx context.Context, c *app.RequestContext) {
 			StatusCode: 0,
 			StatusMsg:  "OK",
 		},
-		User: domain.User{
-			Id:            user.Id,
-			Name:          user.Name,
-			FollowCount:   user.FollowCount,
-			FollowerCount: user.FollowerCount,
-			IsFollow:      user.IsFollow,
-		},
+		User: user,
 	})
 }
 

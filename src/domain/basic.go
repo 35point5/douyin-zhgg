@@ -61,8 +61,8 @@ type User struct {
 }
 
 type FeedRequest struct {
-	LatestTime int64 `query:"latest_time"`
-	Token      string
+	LatestTime int64  `query:"latest_time"`
+	Token      string `query:"token"`
 }
 
 type FeedResponse struct {
@@ -108,12 +108,16 @@ type BasicRepository interface {
 	GetUserByName(name string) UserModel
 	CreateUser(user UserModel) (int64, error)
 	//UserRegister(user UserRegisterRequest) (UserModel, string)
+	IsFollow(id int64, fid int64) bool
+	GetFollowCnt(id int64) int64
+	GetFollowerCnt(id int64) int64
+	IsFavorite(uid int64, vid int64) bool
 }
 
 type BasicUsecase interface {
-	GetVideoByTime(t time.Time) ([]Video, time.Time)
+	GetVideoByTime(t time.Time, uid int64) ([]Video, time.Time)
 	UserRegister(user UserRegisterRequest) (int64, error)
-	UserRequest(userauth UserAuth) UserModel
+	UserRequest(userauth UserAuth) User
 	UserLogin(user UserRegisterRequest) UserModel
 }
 
