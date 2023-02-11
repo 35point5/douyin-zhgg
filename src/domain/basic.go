@@ -35,11 +35,11 @@ type FavoriteListModel struct {
 	//CreatedAt time.Time
 }
 
-type UserFollowModel struct {
-	// UserId follow TargetUserId
-	UserId       int64 `gorm:"primaryKey"`
-	TargetUserId int64 `gorm:"primaryKey"`
-}
+//type UserFollowModel struct {
+//	// UserId follow TargetUserId
+//	UserId       int64 `gorm:"primaryKey"`
+//	TargetUserId int64 `gorm:"primaryKey"`
+//}
 
 type Video struct {
 	Id            int64  `json:"id,omitempty" gorm:"primarykey;AUTO_INCREMENT"`
