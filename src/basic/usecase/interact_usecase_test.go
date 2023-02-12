@@ -18,13 +18,16 @@ func Test_interactUsecase_GetFavoriteListByUserId(t *testing.T) {
 	mockDoerInteractRepo := mocks.NewMockInteractRepository(mockCtrl)
 	mockDoerBasicRepo := mocks.NewMockBasicRepository(mockCtrl)
 
-	mockAuthor := domain.UserModel{
-		Id: 123, Name: "xiaomin", Password: "1234567", FollowCount: 100, FollowerCount: 1000, IsFollow: true,
+	mockUser := domain.User{
+		Id: 123, Name: "xiaomin", FollowCount: 100, FollowerCount: 1000, IsFollow: false,
+	}
+	mockUserModel := domain.UserModel{
+		Id: 123, Name: "xiaomin", Password: "password", FollowCount: 100, FollowerCount: 1000, IsFollow: false,
 	}
 	mockVideos := []domain.Video{
 		{
 			Id:            1,
-			Author:        mockAuthor,
+			Author:        mockUser,
 			PlayUrl:       "PlayUrl1",
 			CoverUrl:      "CoverUrl1",
 			FavoriteCount: 1,
@@ -33,7 +36,7 @@ func Test_interactUsecase_GetFavoriteListByUserId(t *testing.T) {
 		},
 		{
 			Id:            2,
-			Author:        mockAuthor,
+			Author:        mockUser,
 			PlayUrl:       "PlayUrl2",
 			CoverUrl:      "CoverUrl2",
 			FavoriteCount: 12,
@@ -43,7 +46,7 @@ func Test_interactUsecase_GetFavoriteListByUserId(t *testing.T) {
 	}
 
 	// ================ MOCK FUNCTION ARGS ===============
-	mockId := mockAuthor.Id
+	mockId := mockUser.Id
 	mockVid := []int64{mockVideos[0].Id, mockVideos[1].Id}
 	mockErrorId := int64(999)
 	// ================ MOCK FUNCTION ARGS END ===============
@@ -51,12 +54,12 @@ func Test_interactUsecase_GetFavoriteListByUserId(t *testing.T) {
 	// ================ MOCK FUNCTION RETURN ===============
 	mockFavoriteListModels := []domain.FavoriteListModel{
 		{
-			UserID:  mockAuthor.Id,
+			UserID:  mockUser.Id,
 			VideoID: mockVideos[0].Id,
 			Status:  1,
 		},
 		{
-			UserID:  mockAuthor.Id,
+			UserID:  mockUser.Id,
 			VideoID: mockVideos[1].Id,
 			Status:  1,
 		},
@@ -64,7 +67,7 @@ func Test_interactUsecase_GetFavoriteListByUserId(t *testing.T) {
 	mockVideoModles := []domain.VideoModel{
 		{
 			Id:            mockVideos[0].Id,
-			Uid:           mockAuthor.Id,
+			Uid:           mockUser.Id,
 			PlayUrl:       "PlayUrl1",
 			CoverUrl:      "CoverUrl1",
 			FavoriteCount: 1,
@@ -74,7 +77,7 @@ func Test_interactUsecase_GetFavoriteListByUserId(t *testing.T) {
 		},
 		{
 			Id:            mockVideos[1].Id,
-			Uid:           mockAuthor.Id,
+			Uid:           mockUser.Id,
 			PlayUrl:       "PlayUrl2",
 			CoverUrl:      "CoverUrl2",
 			FavoriteCount: 12,
@@ -88,13 +91,13 @@ func Test_interactUsecase_GetFavoriteListByUserId(t *testing.T) {
 	gomock.InOrder(
 		mockDoerInteractRepo.EXPECT().GetFavoriteListByUserId(mockId).Return(mockFavoriteListModels, nil),
 		mockDoerInteractRepo.EXPECT().GetVideoModelsById(mockVid).Return(mockVideoModles, nil),
-		mockDoerBasicRepo.EXPECT().GetUserById(mockId).Return(mockAuthor).MaxTimes(2),
+		mockDoerBasicRepo.EXPECT().GetUserById(mockId).Return(mockUserModel).MaxTimes(2),
 	)
 
 	u := ucase.NewInteractUsecase(mockDoerBasicRepo, mockDoerInteractRepo)
 
 	// ================ TEST CASES ===============
-	test_Arg := mockAuthor.Id
+	test_Arg := mockUser.Id
 	expected_Videos := mockVideos
 	// ================ TEST CASES END ===============
 

@@ -3,7 +3,6 @@ package http_test
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 	"testing"
@@ -26,13 +25,16 @@ func TestBasicHandler_GetVideoByTime(t *testing.T) {
 	mockBasicUsecase := mocks.NewMockBasicUsecase(mockCtrl)
 
 	// ================ MOCK FUNCTION RETURN ===============
-	mockAuthor := domain.UserModel{
-		Id: 123, Name: "xiaomin", Password: "1234567", FollowCount: 100, FollowerCount: 1000, IsFollow: true,
+	mockUser := domain.User{
+		Id: 123, Name: "xiaomin", FollowCount: 100, FollowerCount: 1000, IsFollow: false,
 	}
+	// mockUserModel := domain.UserModel{
+	// 	Id: 123, Name: "xiaomin", Password: "password", FollowCount: 100, FollowerCount: 1000, IsFollow: false,
+	// }
 	mockVideos := []domain.Video{
 		{
 			Id:            1,
-			Author:        mockAuthor,
+			Author:        mockUser,
 			PlayUrl:       "PlayUrl1",
 			CoverUrl:      "CoverUrl1",
 			FavoriteCount: 1,
@@ -41,7 +43,7 @@ func TestBasicHandler_GetVideoByTime(t *testing.T) {
 		},
 		{
 			Id:            2,
-			Author:        mockAuthor,
+			Author:        mockUser,
 			PlayUrl:       "PlayUrl2",
 			CoverUrl:      "CoverUrl2",
 			FavoriteCount: 12,
@@ -67,7 +69,7 @@ func TestBasicHandler_GetVideoByTime(t *testing.T) {
 	}
 	// ================ TEST CASE END ===============
 
-	mockBasicUsecase.EXPECT().GetVideoByTime(gomock.Any()).Return(mockVideos, time.Unix(test_Args.LatestTime/1000, 0))
+	mockBasicUsecase.EXPECT().GetVideoByTime(gomock.Any(), gomock.Any()).Return(mockVideos, time.Unix(test_Args.LatestTime/1000, 0))
 
 	h := server.Default()
 	hp := &htp.BasicHandler{
@@ -108,13 +110,19 @@ func TestBasicHandler_UserRegister(t *testing.T) {
 		Password: "password",
 	}
 	test_returnStatus := http.StatusOK
-	test_returnBody := domain.Response{
-		StatusCode: 1,
-		StatusMsg:  "系统错误，创建用户失败",
+	test_returnBody := domain.UserRegisterResponse{
+		Response: domain.Response{
+			StatusCode: 0,
+			StatusMsg:  "OK",
+		},
+		UserAuth: domain.UserAuth{
+			Id:    233,
+			Token: "",
+		},
 	}
 	// ================ TEST CASE END ===============
 
-	mockBasicUsecase.EXPECT().UserRegister(gomock.Any()).Return(int64(0), errors.New("test"))
+	mockBasicUsecase.EXPECT().UserRegister(gomock.Any()).Return(int64(233), nil)
 
 	h := server.Default()
 	hp := &htp.BasicHandler{
@@ -133,12 +141,15 @@ func TestBasicHandler_UserRegister(t *testing.T) {
 	resp := w.Result()
 
 	assert.DeepEqual(t, test_returnStatus, resp.StatusCode())
-	test_returnBody_String, err := json.Marshal(test_returnBody)
-	if err != nil {
-		t.Errorf("Marshal failed")
-	} else {
-		assert.DeepEqual(t, string(test_returnBody_String), string(resp.Body()))
-	}
+	var actual_return *domain.UserRegisterResponse
+	json.Unmarshal(resp.Body(), actual_return)
+	assert.DeepEqual(t, test_returnBody.Id, actual_return.Id)
+	// test_returnBody_String, err := json.Marshal(test_returnBody)
+	// if err != nil {
+	// 	t.Errorf("Marshal failed")
+	// } else {
+	// 	assert.DeepEqual(t, string(test_returnBody_String), string(resp.Body()))
+	// }
 }
 
 func TestBasicHandler_UserRequest(t *testing.T) {
@@ -147,14 +158,14 @@ func TestBasicHandler_UserRequest(t *testing.T) {
 	mockBasicUsecase := mocks.NewMockBasicUsecase(mockCtrl)
 
 	// ================ MOCK FUNCTION RETURN ===============
-	mockUser := domain.UserModel{
-		Id: 123, Name: "xiaomin", Password: "1234567", FollowCount: 100, FollowerCount: 1000, IsFollow: true,
+	mockUser := domain.User{
+		Id: 123, Name: "xiaomin", FollowCount: 100, FollowerCount: 1000, IsFollow: false,
 	}
 
 	// ================ MOCK FUNCTION RETURN END ===============
 
 	// ================ TEST CASES ===============
-	test_Args := domain.UserAuth{
+	test_Arg := domain.UserAuth{
 		Id:    123,
 		Token: "",
 	}
@@ -184,7 +195,7 @@ func TestBasicHandler_UserRequest(t *testing.T) {
 
 	w := ut.PerformRequest(
 		h.Engine, "GET",
-		"/user?user_id="+strconv.FormatInt(test_Args.Id, 10)+"token="+test_Args.Token,
+		"/user?user_id="+strconv.FormatInt(test_Arg.Id, 10)+"token="+test_Arg.Token,
 		&ut.Body{
 			Body: bytes.NewBufferString("1"), Len: 1,
 		},

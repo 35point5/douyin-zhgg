@@ -5,33 +5,33 @@ import (
 	"douyin-service/basic/delivery/http/middleware"
 	"douyin-service/domain"
 	"fmt"
-	"log"
-	"net/http"
-	"time"
-
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/utils"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/spf13/viper"
+	"log"
+	"net/http"
+	"strconv"
+	"time"
 )
 
 type BasicHandler struct {
 	BUsecase domain.BasicUsecase
+	Mid      *middleware.DouyinMiddleware
 }
 
 func NewBasicHandler(h *server.Hertz, BUsecase domain.BasicUsecase, mid *middleware.DouyinMiddleware) {
-	handler := BasicHandler{BUsecase}
+	handler := BasicHandler{BUsecase, mid}
 	//staticURL := viper.GetString("static_url")
-	staticPath := viper.GetString("static_path")
-	h.Static("/douyin/static/", staticPath)
+	// 这三个不用Token验证
 	h.GET("/douyin/feed", handler.GetVideoByTime)
 	h.POST("/douyin/user/register/", handler.UserRegister)
 	h.POST("/douyin/user/login/", handler.UserLogin)
+	//这需要Token验证
 	authGroup := h.Group("/douyin/")
 	authGroup.Use(mid.TokenAuth())
 	authGroup.GET("/ping/", ping)
 	authGroup.GET("/user/", handler.UserRequest)
+	//h.GET("/douyin/user/", mid.TokenAuth(), handler.UserRequest)
 }
 
 func ping(ctx context.Context, c *app.RequestContext) {
@@ -51,7 +51,13 @@ func (t *BasicHandler) GetVideoByTime(ctx context.Context, c *app.RequestContext
 		})
 		return
 	}
-	videos, lastTime := t.BUsecase.GetVideoByTime(time.Unix(r.LatestTime/1000+1, 0))
+	claims, err := t.Mid.JWTMid.GetClaimsFromJWT(ctx, c)
+	uid := int64(0)
+	if err == nil {
+		uid, _ = strconv.ParseInt(claims["uid"].(string), 10, 64)
+		log.Println("feed uid:", uid)
+	}
+	videos, lastTime := t.BUsecase.GetVideoByTime(time.Unix(r.LatestTime/1000+1, 0), uid)
 	fmt.Println(videos)
 	c.JSON(http.StatusOK, domain.FeedResponse{
 		Response: domain.Response{
@@ -63,10 +69,12 @@ func (t *BasicHandler) GetVideoByTime(ctx context.Context, c *app.RequestContext
 	})
 }
 
-func generateToken(claims domain.TokenClaims) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	key := viper.GetString("jwt_key")
-	return token.SignedString([]byte(key))
+func (t *BasicHandler) generateToken(claims *domain.TokenClaims) (string, error) {
+	str, _, err := t.Mid.JWTMid.TokenGenerator(claims)
+	return str, err
+	//token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	//key := viper.GetString("jwt_key")
+	//return token.SignedString([]byte(key))
 }
 
 func (t *BasicHandler) UserRegister(ctx context.Context, c *app.RequestContext) {
@@ -89,13 +97,9 @@ func (t *BasicHandler) UserRegister(ctx context.Context, c *app.RequestContext) 
 		})
 		return
 	}
-	domainName := viper.GetString("domain")
-	token, err := generateToken(domain.TokenClaims{
-		Id: uid,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour).Unix(),
-			Issuer:    domainName,
-		},
+	//domainName := viper.GetString("domain")
+	token, err := t.generateToken(&domain.TokenClaims{
+		Uid: uid,
 	})
 	if err != nil {
 		log.Println(err)
@@ -136,13 +140,7 @@ func (t *BasicHandler) UserRequest(ctx context.Context, c *app.RequestContext) {
 			StatusCode: 0,
 			StatusMsg:  "OK",
 		},
-		User: domain.User{
-			Id:            user.Id,
-			Name:          user.Name,
-			FollowCount:   user.FollowCount,
-			FollowerCount: user.FollowerCount,
-			IsFollow:      user.IsFollow,
-		},
+		User: user,
 	})
 }
 
@@ -167,13 +165,9 @@ func (t *BasicHandler) UserLogin(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	uid := user.Id
-	domainName := viper.GetString("domain")
-	token, err := generateToken(domain.TokenClaims{
-		Id: uid,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour).Unix(),
-			Issuer:    domainName,
-		},
+	//domainName := viper.GetString("domain")
+	token, err := t.generateToken(&domain.TokenClaims{
+		Uid: uid,
 	})
 	if err != nil {
 		log.Println(err)

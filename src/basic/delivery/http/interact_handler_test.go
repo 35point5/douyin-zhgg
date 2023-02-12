@@ -24,13 +24,13 @@ func TestInteractHandler_GetFavoriteListByUserId(t *testing.T) {
 	mockIUsecase := mocks.NewMockInteractUsecase(mockCtrl)
 
 	// ================ MOCK FUNCTION RETURN ===============
-	mockAuthor := domain.UserModel{
-		Id: 123, Name: "xiaomin", Password: "1234567", FollowCount: 100, FollowerCount: 1000, IsFollow: true,
+	mockUser := domain.User{
+		Id: 123, Name: "xiaomin", FollowCount: 100, FollowerCount: 1000, IsFollow: true,
 	}
 	mockVideos := []domain.Video{
 		{
 			Id:            1,
-			Author:        mockAuthor,
+			Author:        mockUser,
 			PlayUrl:       "PlayUrl1",
 			CoverUrl:      "CoverUrl1",
 			FavoriteCount: 1,
@@ -39,7 +39,7 @@ func TestInteractHandler_GetFavoriteListByUserId(t *testing.T) {
 		},
 		{
 			Id:            2,
-			Author:        mockAuthor,
+			Author:        mockUser,
 			PlayUrl:       "PlayUrl2",
 			CoverUrl:      "CoverUrl2",
 			FavoriteCount: 12,

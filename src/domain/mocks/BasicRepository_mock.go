@@ -91,3 +91,32 @@ func (mr *MockBasicRepositoryMockRecorder) GetVideoByTime(arg0 interface{}) *gom
         mr.mock.ctrl.T.Helper()
         return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVideoByTime", reflect.TypeOf((*MockBasicRepository)(nil).GetVideoByTime), arg0)
 }
+
+// IsFavorite mocks base method.
+func (m *MockBasicRepository) IsFavorite(arg0, arg1 int64) bool {
+        m.ctrl.T.Helper()
+        ret := m.ctrl.Call(m, "IsFavorite", arg0, arg1)
+        ret0, _ := ret[0].(bool)
+        return ret0
+}
+
+// IsFavorite indicates an expected call of IsFavorite.
+func (mr *MockBasicRepositoryMockRecorder) IsFavorite(arg0, arg1 interface{}) *gomock.Call {
+        mr.mock.ctrl.T.Helper()
+        return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsFavorite", reflect.TypeOf((*MockBasicRepository)(nil).IsFavorite), arg0, arg1)
+}
+
+// IsFollow mocks base method.
+func (m *MockBasicRepository) IsFollow(arg0, arg1 int64) bool {
+        m.ctrl.T.Helper()
+        ret := m.ctrl.Call(m, "IsFollow", arg0, arg1)
+        ret0, _ := ret[0].(bool)
+        return ret0
+}
+
+// IsFollow indicates an expected call of IsFollow.
+func (mr *MockBasicRepositoryMockRecorder) IsFollow(arg0, arg1 interface{}) *gomock.Call {
+        mr.mock.ctrl.T.Helper()
+        return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsFollow", reflect.TypeOf((*MockBasicRepository)(nil).IsFollow), 
+arg0, arg1)
+}

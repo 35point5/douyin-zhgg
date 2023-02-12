@@ -61,7 +61,8 @@ func (m *MockInteractRepository) GetFavoriteListByUserId(arg0 int64) ([]domain.F
 // GetFavoriteListByUserId indicates an expected call of GetFavoriteListByUserId.
 func (mr *MockInteractRepositoryMockRecorder) GetFavoriteListByUserId(arg0 interface{}) *gomock.Call {
         mr.mock.ctrl.T.Helper()
-        return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFavoriteListByUserId", reflect.TypeOf((*MockInteractRepository)(nil).GetFavoriteListByUserId), arg0)}
+        return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFavoriteListByUserId", reflect.TypeOf((*MockInteractRepository)(nil).GetFavoriteListByUserId), arg0)
+}
 
 // GetVideoModelsById mocks base method.
 func (m *MockInteractRepository) GetVideoModelsById(arg0 []int64) ([]domain.VideoModel, error) {

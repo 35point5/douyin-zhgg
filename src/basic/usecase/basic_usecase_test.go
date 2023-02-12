@@ -13,34 +13,44 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_basicUsecase_GetUserInfo(t *testing.T) {
+
+}
+
 func Test_basicUsecase_GetVideoByTime(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 	mockDoer := mocks.NewMockBasicRepository(mockCtrl)
 
 	// ================ TEST CASES ===============
-	mockAuthor := domain.UserModel{
-		Id: 123, Name: "xiaomin", Password: "1234567", FollowCount: 100, FollowerCount: 1000, IsFollow: true,
+	mockUser := domain.User{
+		Id: 123, Name: "xiaomin", FollowCount: 100, FollowerCount: 1000, IsFollow: false,
 	}
-	test_Args := time.Unix(99999999, 0)
+	mockUserModel := domain.UserModel{
+		Id: 123, Name: "xiaomin", Password: "password", FollowCount: 100, FollowerCount: 1000, IsFollow: false,
+	}
+	test_Arg1 := time.Unix(99999999, 0)
+	test_Arg2 := int64(123)
 	expected_Videos := []domain.Video{
 		{
 			Id:            1,
-			Author:        mockAuthor,
+			Author:        mockUser,
 			PlayUrl:       "PlayUrl1",
 			CoverUrl:      "CoverUrl1",
 			FavoriteCount: 1,
 			CommentCount:  2,
 			IsFavorite:    false,
+			Title:         "vd1",
 		},
 		{
 			Id:            2,
-			Author:        mockAuthor,
+			Author:        mockUser,
 			PlayUrl:       "PlayUrl2",
 			CoverUrl:      "CoverUrl2",
 			FavoriteCount: 12,
 			CommentCount:  26,
 			IsFavorite:    false,
+			Title:         "vd2",
 		},
 	}
 	expected_Time := time.Unix(100000000, 0)
@@ -54,34 +64,41 @@ func Test_basicUsecase_GetVideoByTime(t *testing.T) {
 	mockVideoModel := []domain.VideoModel{
 		{
 			Id:            1,
-			Uid:           mockAuthor.Id,
+			Uid:           mockUser.Id,
 			PlayUrl:       "PlayUrl1",
 			CoverUrl:      "CoverUrl1",
 			FavoriteCount: 1,
 			CommentCount:  2,
 			IsFavorite:    false,
+			Title:         "vd1",
 			UpdatedTime:   time.Unix(1000000, 0),
 		},
 		{
 			Id:            2,
-			Uid:           mockAuthor.Id,
+			Uid:           mockUser.Id,
 			PlayUrl:       "PlayUrl2",
 			CoverUrl:      "CoverUrl2",
 			FavoriteCount: 12,
 			CommentCount:  26,
 			IsFavorite:    false,
+			Title:         "vd2",
 			UpdatedTime:   time.Unix(100000000, 0),
 		},
 	}
 	// ================ MOCK FUNCTION RETURN END ===============
 
 	gomock.InOrder(
-		mockDoer.EXPECT().GetVideoByTime(test_Args).Return(mockVideoModel),
-		mockDoer.EXPECT().GetUserById(mockAuthor.Id).Return(mockAuthor).AnyTimes(),
+		mockDoer.EXPECT().GetVideoByTime(gomock.Any()).Return(mockVideoModel),
+		mockDoer.EXPECT().GetUserById(mockUser.Id).Return(mockUserModel),
+		mockDoer.EXPECT().IsFollow(gomock.Any(), gomock.Any()).Return(false),
+		mockDoer.EXPECT().IsFavorite(mockUser.Id, gomock.Any()).Return(false),
+		mockDoer.EXPECT().GetUserById(mockUser.Id).Return(mockUserModel),
+		mockDoer.EXPECT().IsFollow(gomock.Any(), gomock.Any()).Return(false),
+		mockDoer.EXPECT().IsFavorite(mockUser.Id, gomock.Any()).Return(false),
 	)
 
 	u := ucase.NewBasicUsecase(mockDoer)
-	actual_Videos, actual_Time := u.GetVideoByTime(test_Args)
+	actual_Videos, actual_Time := u.GetVideoByTime(test_Arg1, test_Arg2)
 
 	assert.Equal(t, expected_Time, actual_Time)
 	assert.Equal(t, expected_Videos, actual_Videos)

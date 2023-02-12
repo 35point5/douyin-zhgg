@@ -36,18 +36,18 @@ func (m *MockBasicUsecase) EXPECT() *MockBasicUsecaseMockRecorder {
 }
 
 // GetVideoByTime mocks base method.
-func (m *MockBasicUsecase) GetVideoByTime(arg0 time.Time) ([]domain.Video, time.Time) {
+func (m *MockBasicUsecase) GetVideoByTime(arg0 time.Time, arg1 int64) ([]domain.Video, time.Time) {
         m.ctrl.T.Helper()
-        ret := m.ctrl.Call(m, "GetVideoByTime", arg0)
+        ret := m.ctrl.Call(m, "GetVideoByTime", arg0, arg1)
         ret0, _ := ret[0].([]domain.Video)
         ret1, _ := ret[1].(time.Time)
         return ret0, ret1
 }
 
 // GetVideoByTime indicates an expected call of GetVideoByTime.
-func (mr *MockBasicUsecaseMockRecorder) GetVideoByTime(arg0 interface{}) *gomock.Call {
+func (mr *MockBasicUsecaseMockRecorder) GetVideoByTime(arg0, arg1 interface{}) *gomock.Call {
         mr.mock.ctrl.T.Helper()
-        return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVideoByTime", reflect.TypeOf((*MockBasicUsecase)(nil).GetVideoByTime), arg0)
+        return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVideoByTime", reflect.TypeOf((*MockBasicUsecase)(nil).GetVideoByTime), arg0, arg1)
 }
 
 // UserLogin mocks base method.
@@ -80,10 +80,10 @@ func (mr *MockBasicUsecaseMockRecorder) UserRegister(arg0 interface{}) *gomock.C
 }
 
 // UserRequest mocks base method.
-func (m *MockBasicUsecase) UserRequest(arg0 domain.UserAuth) domain.UserModel {
+func (m *MockBasicUsecase) UserRequest(arg0 domain.UserAuth) domain.User {
         m.ctrl.T.Helper()
         ret := m.ctrl.Call(m, "UserRequest", arg0)
-        ret0, _ := ret[0].(domain.UserModel)
+        ret0, _ := ret[0].(domain.User)
         return ret0
 }
 
