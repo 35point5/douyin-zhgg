@@ -70,16 +70,23 @@ func (m *mysqlBasicRepository) IsFavorite(uid int64, vid int64) bool {
 
 // IsFollow returns whether id follows fid
 func (m *mysqlBasicRepository) IsFollow(id int64, fid int64) bool {
-	//TODO: 等follow接口实现
-	//temp := domain.UserFollowModel{
-	//	UserId:       id,
-	//	TargetUserId: fid,
-	//}
-	//res := m.Mysql.First(&temp)
-	//if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-	//	return false
-	//}
-	return true
+	temp := domain.FollowListModel{
+		UserID:   id,
+		ToUserID: fid,
+	}
+	res := m.Mysql.First(&temp)
+	if res.Error == nil && (temp.Status == 0 || temp.Status == 2) {
+		return true
+	}
+	temp = domain.FollowListModel{
+		UserID:   fid,
+		ToUserID: id,
+	}
+	res = m.Mysql.First(&temp)
+	if res.Error == nil && temp.Status == 2 {
+		return true
+	}
+	return false
 }
 
 //func (m *mysqlBasicRepository) GetFollowCnt(id int64) int64 {

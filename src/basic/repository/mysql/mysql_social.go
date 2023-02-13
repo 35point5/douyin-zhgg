@@ -5,6 +5,7 @@ import (
 	"errors"
 	"gorm.io/gorm"
 	"log"
+	"strconv"
 )
 
 type mysqlSocialRepository struct {
@@ -101,13 +102,13 @@ func (m *mysqlSocialRepository) FollowActionByUserId(user_id int64, to_user_id i
 	um2 := domain.UserModel{
 		Id: to_user_id,
 	}
-	err := m.Mysql.First(&um1)
-	if err != nil {
-		return false, errors.New("cannot find user")
+	res := m.Mysql.First(&um1)
+	if res.Error != nil {
+		return false, errors.New("cannot find user " + strconv.FormatInt(user_id, 10))
 	}
-	err = m.Mysql.First(&um2)
-	if err != nil {
-		return false, errors.New("cannot find user")
+	res = m.Mysql.First(&um2)
+	if res.Error != nil {
+		return false, errors.New("cannot find user " + strconv.FormatInt(to_user_id, 10))
 	}
 	if action_type == 1 {
 		flm.Status = 0
