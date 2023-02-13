@@ -3,9 +3,11 @@ package mysql
 import (
 	"douyin-service/domain"
 	"errors"
+	"log"
+	"time"
+
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
-	"log"
 )
 
 type mysqlInteractRepository struct {
@@ -91,4 +93,59 @@ func (m *mysqlInteractRepository) FavoriteActionByUserId(user_id int64, video_id
 		return false, errors.New("action_type must be 1 or 2 !")
 	}
 	return true, nil
+}
+
+func (m *mysqlInteractRepository) GetUser(user_id int64) (domain.UserModel, error) {
+	var userModel domain.UserModel
+	userModel.Id = user_id
+	judgeRes := m.Mysql.First(&userModel)
+	if errors.Is(judgeRes.Error, gorm.ErrRecordNotFound) {
+		return userModel, errors.New("user id is not exist!")
+	} else if judgeRes.Error != nil {
+		return userModel, judgeRes.Error
+	}
+	return userModel, nil
+}
+
+func (m *mysqlInteractRepository) CommentActionByUserId(user_id int64, video_id int64, content string, action_type int32, comment_id int64) error {
+	return nil
+}
+
+func (m *mysqlInteractRepository) GetCommentListByVideoId(video_id int64) ([]domain.CommentModel, error) {
+	var res []domain.CommentModel
+	judgeRes := m.Mysql.Where("video_id = ?", video_id).Find(&res)
+	if errors.Is(judgeRes.Error, gorm.ErrRecordNotFound) {
+		return res, errors.New("favorite list is null !")
+	} else if judgeRes.Error != nil {
+		return res, judgeRes.Error
+	}
+	return res, nil
+}
+
+func (m *mysqlInteractRepository) AddCommentByUserId(user_id int64, video_id int64, content string) (domain.CommentModel, error) {
+	model := domain.CommentModel{
+		UserID:      user_id,
+		VideoID:     video_id,
+		CommentText: content,
+		CreateDate:  time.Now().Format("2006-01-02 15:04:05"),
+	}
+	err := m.Mysql.Save(&model)
+	if err != nil {
+		return model, errors.New("评论失败！")
+	} else {
+		return model, nil
+	}
+}
+
+func (m *mysqlInteractRepository) DeleteCommentById(user_id int64, comment_id int64) (domain.CommentModel, error) {
+	var model domain.CommentModel
+	ret := m.Mysql.First(&model, comment_id)
+	if ret != nil {
+		return model, errors.New("评论不存在！")
+	}
+	ret = m.Mysql.Delete(&model)
+	if ret != nil {
+		return model, errors.New("删除失败！")
+	}
+	return model, nil
 }

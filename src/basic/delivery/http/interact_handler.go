@@ -5,11 +5,12 @@ import (
 	"douyin-service/basic/delivery/http/middleware"
 	"douyin-service/domain"
 	"fmt"
-	"github.com/cloudwego/hertz/pkg/app/server"
 	"log"
 	"net/http"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/app/server"
 )
-import "github.com/cloudwego/hertz/pkg/app"
 
 type InteractHandler struct {
 	IUsecase domain.InteractUsecase
@@ -17,10 +18,12 @@ type InteractHandler struct {
 
 func NewInteractHandler(h *server.Hertz, IUsecase domain.InteractUsecase, mid *middleware.DouyinMiddleware) {
 	handler := InteractHandler{IUsecase}
-	authGroup := h.Group("/douyin/favorite")
+	authGroup := h.Group("/douyin")
 	authGroup.Use(mid.TokenAuth())
-	authGroup.POST("/action/", handler.FavoriteAction)
-	authGroup.GET("/list/", handler.GetFavoriteListByUserId)
+	authGroup.POST("/favorite/action/", handler.FavoriteAction)
+	authGroup.GET("/favorite/list/", handler.GetFavoriteListByUserId)
+	authGroup.POST("/comment/action/", handler.CommentAction)
+	authGroup.GET("/comment/list/", handler.GetCommentByVideoId)
 }
 
 func (t *InteractHandler) GetFavoriteListByUserId(ctx context.Context, c *app.RequestContext) {
@@ -99,4 +102,67 @@ func (t *InteractHandler) FavoriteAction(ctx context.Context, c *app.RequestCont
 			StatusMsg:  "OK",
 		},
 	})
+}
+
+func (t *InteractHandler) GetCommentByVideoId(ctx context.Context, c *app.RequestContext) {
+	var request domain.CommentListRequest
+	err := c.Bind(&request)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusOK, domain.Response{
+			StatusCode: 1,
+			StatusMsg:  "系统错误，获取参数失败",
+		})
+		return
+	}
+	comments, err := t.IUsecase.GetCommentListByVideoId(request.VideoId)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusOK, domain.Response{
+			StatusCode: 1,
+			StatusMsg:  "系统错误，获取评论列表失败",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, domain.CommentListResponse{
+		Response: domain.Response{
+			StatusCode: 0,
+			StatusMsg:  "OK",
+		},
+		CommentList: comments,
+	})
+}
+
+func (t *InteractHandler) CommentAction(ctx context.Context, c *app.RequestContext) {
+	var request domain.CommentActionRequest
+	err := c.Bind(&request)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusOK, domain.CommentActionResponse{
+			Response: domain.Response{
+				StatusCode: 1,
+				StatusMsg:  err.Error(),
+			},
+			Comment: domain.Comment{},
+		})
+		return
+	}
+	comment, err := t.IUsecase.CommentAction(0, request.VideoId, request.CommentText, request.CommentId, request.ActionType)
+	if err != nil {
+		c.JSON(http.StatusOK, domain.CommentActionResponse{
+			Response: domain.Response{
+				StatusCode: 1,
+				StatusMsg:  err.Error(),
+			},
+			Comment: comment,
+		})
+	} else {
+		c.JSON(http.StatusOK, domain.CommentActionResponse{
+			Response: domain.Response{
+				StatusCode: 0,
+				StatusMsg:  "OK",
+			},
+			Comment: comment,
+		})
+	}
 }

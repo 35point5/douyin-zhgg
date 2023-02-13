@@ -35,6 +35,15 @@ type FavoriteListModel struct {
 	//CreatedAt time.Time
 }
 
+type CommentModel struct {
+	ID          int64  `gorm:"primaryKey;autoIncrement:true"`
+	UserID      int64  `gorm:"autoIncrement:false"`
+	VideoID     int64  `gorm:"autoIncrement:false"`
+	Status      uint32 `json:"status" gorm:"default:1"`
+	CommentText string `json:"comment_text"`
+	CreateDate  string
+}
+
 type UserFollowModel struct {
 	// UserId follow TargetUserId
 	UserId       int64 `gorm:"primaryKey"`
@@ -58,6 +67,13 @@ type User struct {
 	FollowCount   int64  `json:"follow_count,omitempty"`
 	FollowerCount int64  `json:"follower_count,omitempty"`
 	IsFollow      bool   `json:"is_follow,omitempty"`
+}
+
+type Comment struct {
+	Id         int64  `json:"id,omitempty"`
+	User       User   `json:"user"`
+	Content    string `json:"content"`
+	CreateDate string `json:"create_date"`
 }
 
 type FeedRequest struct {
@@ -132,15 +148,44 @@ type FavoriteListResponse struct {
 	VideoList []Video `json:"video_list"`
 }
 
+type CommentActionRequest struct {
+	Token       string `query:"token"`
+	VideoId     int64  `query:"video_id"`
+	ActionType  int    `query:"action_type"`
+	CommentText string `query:"comment_text"`
+	CommentId   int64  `query:"comment_id"`
+}
+
+type CommentActionResponse struct {
+	Response
+	Comment Comment `json:"comment"`
+}
+
+type CommentListRequest struct {
+	Token   string `query:"token"`
+	VideoId int64  `query:"video_id"`
+}
+
+type CommentListResponse struct {
+	Response
+	CommentList []Comment `json:"comment_list"`
+}
+
 type InteractRepository interface {
 	GetVideoModelsById(id []int64) ([]VideoModel, error)
 	GetFavoriteListByUserId(id int64) ([]FavoriteListModel, error)
 	FavoriteActionByUserId(user_id int64, video_id int64, action_type int32) (bool, error)
+	GetCommentListByVideoId(video_id int64) ([]CommentModel, error)
+	GetUser(user_id int64) (UserModel, error)
+	AddCommentByUserId(user_id int64, video_id int64, content string) (CommentModel, error)
+	DeleteCommentById(user_id int64, comment_id int64) (CommentModel, error)
 }
 
 type InteractUsecase interface {
 	GetFavoriteListByUserId(id int64) ([]Video, error)
 	FavoriteActionByUserId(user_id int64, video_id int64, action_type int32) (bool, error)
+	GetCommentListByVideoId(video_id int64) ([]Comment, error)
+	CommentAction(user_id int64, video_id int64, content string, comment_id int64, action_type int) (Comment, error)
 }
 
 type FavoriteActionRequest struct {
