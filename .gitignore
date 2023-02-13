@@ -22,4 +22,4 @@ go.work
 
 .idea
 /src/config.json
-/src/public
+# /src/public

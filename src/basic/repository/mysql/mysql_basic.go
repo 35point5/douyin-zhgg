@@ -22,14 +22,22 @@ func NewMysqlBasicRepository(conn *gorm.DB, debug bool) domain.BasicRepository {
 	if debug {
 		domainName := viper.GetString("domain")
 		staticURL := viper.GetString("static_url")
-		conn.Create(&domain.VideoModel{
-			Id:            0,
-			Uid:           24,
-			PlayUrl:       domainName + staticURL + "/bear.mp4",
-			CoverUrl:      domainName + staticURL + "/cover.jpg",
-			FavoriteCount: 0,
-			CommentCount:  0,
-			UpdatedTime:   time.Now(),
+		conn.Exec("DELETE FROM user_models")
+		conn.Exec("DELETE FROM video_models")
+		conn.Create(&domain.UserModel{Id: 0, Name: "user0", Password: "123456", FollowCount: 0, FollowerCount: 0})
+		conn.Create(&domain.UserModel{Id: 1, Name: "user1", Password: "123456", FollowCount: 1, FollowerCount: 3})
+		conn.Create(&domain.UserModel{Id: 2, Name: "user2", Password: "123456", FollowCount: 1, FollowerCount: 1})
+		conn.Create(&domain.UserModel{Id: 3, Name: "user3", Password: "123456", FollowCount: 1, FollowerCount: 0})
+		conn.Create(&domain.UserModel{Id: 4, Name: "user4", Password: "123456", FollowCount: 1, FollowerCount: 0})
+
+		conn.Create(&domain.VideoModel{Id: 1, Uid: 1, PlayUrl: domainName + staticURL + "/bear.mp4",
+			CoverUrl: domainName + staticURL + "/cover.jpg", FavoriteCount: 3, CommentCount: 2, Title: "video1", UpdatedTime: time.Now(),
+		})
+		conn.Create(&domain.VideoModel{Id: 2, Uid: 2, PlayUrl: domainName + staticURL + "/song1.mp4",
+			CoverUrl: domainName + staticURL + "/song1.jpg", FavoriteCount: 1, CommentCount: 1, Title: "video2", UpdatedTime: time.Now(),
+		})
+		conn.Create(&domain.VideoModel{Id: 3, Uid: 2, PlayUrl: domainName + staticURL + "/song2.mp4",
+			CoverUrl: domainName + staticURL + "/song2.jpg", FavoriteCount: 0, CommentCount: 0, Title: "video3", UpdatedTime: time.Now(),
 		})
 	}
 	return &mysqlBasicRepository{conn}

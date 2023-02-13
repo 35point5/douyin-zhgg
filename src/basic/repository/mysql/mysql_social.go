@@ -3,9 +3,10 @@ package mysql
 import (
 	"douyin-service/domain"
 	"errors"
-	"gorm.io/gorm"
 	"log"
 	"strconv"
+
+	"gorm.io/gorm"
 )
 
 type mysqlSocialRepository struct {
@@ -17,9 +18,11 @@ func NewMysqlSocialRepository(conn *gorm.DB, debug bool) domain.SocialRepository
 		log.Fatal(err)
 	}
 	if debug {
-		conn.Save(&domain.FollowListModel{UserID: 1, ToUserID: 2, Status: 1})
-		conn.Save(&domain.FollowListModel{UserID: 1, ToUserID: 3, Status: 1})
-		conn.Save(&domain.FollowListModel{UserID: 2, ToUserID: 1, Status: 1})
+		conn.Exec("DELETE FROM follow_list_models")
+		conn.Save(&domain.FollowListModel{UserID: 1, ToUserID: 2, Status: 2})
+		conn.Save(&domain.FollowListModel{UserID: 2, ToUserID: 1, Status: 2})
+		conn.Save(&domain.FollowListModel{UserID: 3, ToUserID: 1, Status: 0})
+		conn.Save(&domain.FollowListModel{UserID: 4, ToUserID: 1, Status: 0})
 	}
 	return &mysqlSocialRepository{conn}
 }

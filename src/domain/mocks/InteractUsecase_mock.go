@@ -34,6 +34,21 @@ func (m *MockInteractUsecase) EXPECT() *MockInteractUsecaseMockRecorder {
         return m.recorder
 }
 
+// CommentAction mocks base method.
+func (m *MockInteractUsecase) CommentAction(arg0, arg1 int64, arg2 string, arg3 int64, arg4 int) (domain.Comment, error) {
+        m.ctrl.T.Helper()
+        ret := m.ctrl.Call(m, "CommentAction", arg0, arg1, arg2, arg3, arg4)
+        ret0, _ := ret[0].(domain.Comment)
+        ret1, _ := ret[1].(error)
+        return ret0, ret1
+}
+
+// CommentAction indicates an expected call of CommentAction.
+func (mr *MockInteractUsecaseMockRecorder) CommentAction(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+        mr.mock.ctrl.T.Helper()
+        return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CommentAction", reflect.TypeOf((*MockInteractUsecase)(nil).CommentAction), arg0, arg1, arg2, arg3, arg4)
+}
+
 // FavoriteActionByUserId mocks base method.
 func (m *MockInteractUsecase) FavoriteActionByUserId(arg0, arg1 int64, arg2 int32) (bool, error) {
         m.ctrl.T.Helper()
@@ -47,6 +62,21 @@ func (m *MockInteractUsecase) FavoriteActionByUserId(arg0, arg1 int64, arg2 int3
 func (mr *MockInteractUsecaseMockRecorder) FavoriteActionByUserId(arg0, arg1, arg2 interface{}) *gomock.Call {
         mr.mock.ctrl.T.Helper()
         return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FavoriteActionByUserId", reflect.TypeOf((*MockInteractUsecase)(nil).FavoriteActionByUserId), arg0, arg1, arg2)
+}
+
+// GetCommentListByVideoId mocks base method.
+func (m *MockInteractUsecase) GetCommentListByVideoId(arg0 int64) ([]domain.Comment, error) {
+        m.ctrl.T.Helper()
+        ret := m.ctrl.Call(m, "GetCommentListByVideoId", arg0)
+        ret0, _ := ret[0].([]domain.Comment)
+        ret1, _ := ret[1].(error)
+        return ret0, ret1
+}
+
+// GetCommentListByVideoId indicates an expected call of GetCommentListByVideoId.
+func (mr *MockInteractUsecaseMockRecorder) GetCommentListByVideoId(arg0 interface{}) *gomock.Call {
+        mr.mock.ctrl.T.Helper()
+        return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCommentListByVideoId", reflect.TypeOf((*MockInteractUsecase)(nil).GetCommentListByVideoId), arg0)
 }
 
 // GetFavoriteListByUserId mocks base method.

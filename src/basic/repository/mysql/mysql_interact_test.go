@@ -20,7 +20,7 @@ func Test_mysqlInteractRepository_GetVideoModelsById(t *testing.T) {
 	// ================ TEST CASES ===============
 	test_Args := []int64{123}
 	mockUser := domain.UserModel{
-		Id: 123, Name: "xiaomin", Password: "1234567", FollowCount: 100, FollowerCount: 1000, IsFollow: true,
+		Id: 123, Name: "xiaomin", Password: "1234567", FollowCount: 100, FollowerCount: 1000,
 	}
 	expected_VideoModels := []domain.VideoModel{
 		{
@@ -30,7 +30,6 @@ func Test_mysqlInteractRepository_GetVideoModelsById(t *testing.T) {
 			CoverUrl:      "CoverUrl1",
 			FavoriteCount: 1,
 			CommentCount:  2,
-			IsFavorite:    false,
 			UpdatedTime:   time.Unix(1000001000, 0),
 		},
 		{
@@ -40,7 +39,6 @@ func Test_mysqlInteractRepository_GetVideoModelsById(t *testing.T) {
 			CoverUrl:      "CoverUrl2",
 			FavoriteCount: 12,
 			CommentCount:  26,
-			IsFavorite:    false,
 			UpdatedTime:   time.Unix(1000002000, 0),
 		},
 	}
@@ -50,7 +48,7 @@ func Test_mysqlInteractRepository_GetVideoModelsById(t *testing.T) {
 
 	mockRows := sqlmock.NewRows([]string{"id", "uid", "play_url", "cover_url", "favorite_count", "comment_count", "is_favorite", "updated_time"})
 	for _, expd_v := range expected_VideoModels {
-		mockRows.AddRow(expd_v.Id, expd_v.Uid, expd_v.PlayUrl, expd_v.CoverUrl, expd_v.FavoriteCount, expd_v.CommentCount, expd_v.IsFavorite, expd_v.UpdatedTime)
+		mockRows.AddRow(expd_v.Id, expd_v.Uid, expd_v.PlayUrl, expd_v.CoverUrl, expd_v.FavoriteCount, expd_v.CommentCount, expd_v.UpdatedTime)
 	}
 	mock.ExpectQuery(sql).WillReturnRows(mockRows)
 

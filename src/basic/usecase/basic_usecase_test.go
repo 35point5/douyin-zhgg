@@ -27,7 +27,7 @@ func Test_basicUsecase_GetVideoByTime(t *testing.T) {
 		Id: 123, Name: "xiaomin", FollowCount: 100, FollowerCount: 1000, IsFollow: false,
 	}
 	mockUserModel := domain.UserModel{
-		Id: 123, Name: "xiaomin", Password: "password", FollowCount: 100, FollowerCount: 1000, IsFollow: false,
+		Id: 123, Name: "xiaomin", Password: "password", FollowCount: 100, FollowerCount: 1000,
 	}
 	test_Arg1 := time.Unix(99999999, 0)
 	test_Arg2 := int64(123)
@@ -69,7 +69,6 @@ func Test_basicUsecase_GetVideoByTime(t *testing.T) {
 			CoverUrl:      "CoverUrl1",
 			FavoriteCount: 1,
 			CommentCount:  2,
-			IsFavorite:    false,
 			Title:         "vd1",
 			UpdatedTime:   time.Unix(1000000, 0),
 		},
@@ -80,7 +79,6 @@ func Test_basicUsecase_GetVideoByTime(t *testing.T) {
 			CoverUrl:      "CoverUrl2",
 			FavoriteCount: 12,
 			CommentCount:  26,
-			IsFavorite:    false,
 			Title:         "vd2",
 			UpdatedTime:   time.Unix(100000000, 0),
 		},
@@ -117,7 +115,6 @@ func Test_basicUsecase_UserRegister(t *testing.T) {
 			Password:      "password",
 			FollowCount:   0,
 			FollowerCount: 0,
-			IsFollow:      false,
 		},
 		{
 			Id:            0,
@@ -125,7 +122,6 @@ func Test_basicUsecase_UserRegister(t *testing.T) {
 			Password:      "password",
 			FollowCount:   0,
 			FollowerCount: 0,
-			IsFollow:      false,
 		},
 	}
 	// ================ MOCK FUNCTION ARGS END ===============

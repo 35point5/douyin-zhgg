@@ -15,15 +15,22 @@ type mysqlInteractRepository struct {
 }
 
 func NewMysqlInteractRepository(conn *gorm.DB, debug bool) domain.InteractRepository {
-	if err := conn.AutoMigrate(&domain.FavoriteListModel{}); err != nil {
+	if err := conn.AutoMigrate(&domain.FavoriteListModel{}, &domain.CommentModel{}); err != nil {
 		log.Fatal(err)
 	}
 
 	if debug {
+		conn.Exec("DELETE FROM favorite_list_models")
+		conn.Exec("DELETE FROM comment_models")
 		conn.Save(&domain.FavoriteListModel{UserID: 1, VideoID: 2, Status: 1})
-		conn.Save(&domain.FavoriteListModel{UserID: 1, VideoID: 3, Status: 1})
-		conn.Save(&domain.FavoriteListModel{UserID: 1, VideoID: 2, Status: 1})
-		conn.Save(&domain.FavoriteListModel{UserID: 3, VideoID: 3, Status: 1})
+		conn.Save(&domain.FavoriteListModel{UserID: 2, VideoID: 1, Status: 1})
+		conn.Save(&domain.FavoriteListModel{UserID: 3, VideoID: 1, Status: 1})
+		conn.Save(&domain.FavoriteListModel{UserID: 4, VideoID: 1, Status: 1})
+
+		conn.Save(&domain.CommentModel{ID: 1, UserID: 1, VideoID: 1, Status: 1, CommentText: "好看！"})
+		conn.Save(&domain.CommentModel{ID: 2, UserID: 2, VideoID: 1, Status: 1, CommentText: "不好看！"})
+		conn.Save(&domain.CommentModel{ID: 3, UserID: 3, VideoID: 2, Status: 1, CommentText: "太好看了！"})
+
 	}
 	return &mysqlInteractRepository{conn}
 }
@@ -129,8 +136,8 @@ func (m *mysqlInteractRepository) AddCommentByUserId(user_id int64, video_id int
 		CommentText: content,
 		CreateDate:  time.Now().Format("2006-01-02 15:04:05"),
 	}
-	err := m.Mysql.Save(&model)
-	if err != nil {
+	ret := m.Mysql.Save(&model)
+	if ret.Error != nil {
 		return model, errors.New("评论失败！")
 	} else {
 		return model, nil
@@ -140,11 +147,11 @@ func (m *mysqlInteractRepository) AddCommentByUserId(user_id int64, video_id int
 func (m *mysqlInteractRepository) DeleteCommentById(user_id int64, comment_id int64) (domain.CommentModel, error) {
 	var model domain.CommentModel
 	ret := m.Mysql.First(&model, comment_id)
-	if ret != nil {
+	if ret.Error != nil {
 		return model, errors.New("评论不存在！")
 	}
 	ret = m.Mysql.Delete(&model)
-	if ret != nil {
+	if ret.Error != nil {
 		return model, errors.New("删除失败！")
 	}
 	return model, nil

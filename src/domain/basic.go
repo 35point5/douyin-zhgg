@@ -12,10 +12,8 @@ type VideoModel struct {
 	CoverUrl      string `json:"cover_url,omitempty"`
 	FavoriteCount int64  `json:"favorite_count,omitempty"`
 	CommentCount  int64  `json:"comment_count,omitempty"`
-	// TODO IsFavorite 这个字段是没用的，并且是不正确的，应该通过 FavoriteListModel 去确认是否点赞
-	IsFavorite  bool   `json:"is_favorite,omitempty"`
-	Title       string `json:"title,omitempty"`
-	UpdatedTime time.Time
+	Title         string `json:"title,omitempty"`
+	UpdatedTime   time.Time
 }
 
 type UserModel struct {
@@ -24,8 +22,6 @@ type UserModel struct {
 	Password      string `json:"password,omitempty"`
 	FollowCount   int64  `json:"follow_count,omitempty"`
 	FollowerCount int64  `json:"follower_count,omitempty"`
-	// TODO IsFollow 这个字段同样是没用且不正确的，应该通过 UserFollowModel 去确认是否关注
-	IsFollow bool `json:"is_follow,omitempty"`
 }
 
 type FavoriteListModel struct {

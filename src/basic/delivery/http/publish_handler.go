@@ -6,6 +6,10 @@ import (
 	"douyin-service/basic/delivery/http/middleware"
 	"douyin-service/domain"
 	"fmt"
+	"log"
+	"os"
+	"time"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -13,9 +17,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/spf13/viper"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
-	"log"
-	"os"
-	"time"
 )
 
 type PublishHandler struct {
@@ -118,8 +119,8 @@ func (h *PublishHandler) Publish(ctx context.Context, c *app.RequestContext) {
 
 	vm := domain.VideoModel{
 		Uid:           userId,
-		PlayUrl:       h.domainName + h.staticURL + videoName,
-		CoverUrl:      h.domainName + h.staticURL + imageName,
+		PlayUrl:       h.domainName + h.staticURL + "/" + videoName,
+		CoverUrl:      h.domainName + h.staticURL + "/" + imageName,
 		FavoriteCount: 0,
 		CommentCount:  0,
 		Title:         req.Title,

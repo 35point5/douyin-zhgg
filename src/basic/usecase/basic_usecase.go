@@ -53,7 +53,6 @@ func (u *basicUsecase) UserRegister(user domain.UserRegisterRequest) (int64, err
 		Password:      user.Password,
 		FollowCount:   0,
 		FollowerCount: 0,
-		IsFollow:      false,
 	})
 	if err != nil {
 		return 0, err

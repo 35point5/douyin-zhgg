@@ -22,7 +22,7 @@ func Test_interactUsecase_GetFavoriteListByUserId(t *testing.T) {
 		Id: 123, Name: "xiaomin", FollowCount: 100, FollowerCount: 1000, IsFollow: false,
 	}
 	mockUserModel := domain.UserModel{
-		Id: 123, Name: "xiaomin", Password: "password", FollowCount: 100, FollowerCount: 1000, IsFollow: false,
+		Id: 123, Name: "xiaomin", Password: "password", FollowCount: 100, FollowerCount: 1000,
 	}
 	mockVideos := []domain.Video{
 		{
@@ -72,7 +72,6 @@ func Test_interactUsecase_GetFavoriteListByUserId(t *testing.T) {
 			CoverUrl:      "CoverUrl1",
 			FavoriteCount: 1,
 			CommentCount:  2,
-			IsFavorite:    false,
 			UpdatedTime:   time.Unix(100000001, 0),
 		},
 		{
@@ -82,7 +81,6 @@ func Test_interactUsecase_GetFavoriteListByUserId(t *testing.T) {
 			CoverUrl:      "CoverUrl2",
 			FavoriteCount: 12,
 			CommentCount:  26,
-			IsFavorite:    false,
 			UpdatedTime:   time.Unix(100000000, 0),
 		},
 	}

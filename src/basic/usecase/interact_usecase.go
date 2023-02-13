@@ -43,7 +43,7 @@ func (u *interactUsecase) GetFavoriteListByUserId(id int64) ([]domain.Video, err
 			CoverUrl:      vm.CoverUrl,
 			FavoriteCount: vm.FavoriteCount,
 			CommentCount:  vm.CommentCount,
-			IsFavorite:    vm.IsFavorite,
+			IsFavorite:    false, // TODO
 		})
 	}
 	if len(vms) == 0 {
