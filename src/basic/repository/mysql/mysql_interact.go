@@ -140,6 +140,10 @@ func (m *mysqlInteractRepository) AddCommentByUserId(user_id int64, video_id int
 	if ret.Error != nil {
 		return model, errors.New("评论失败！")
 	} else {
+		var vm domain.VideoModel
+		m.Mysql.First(&vm, video_id)
+		vm.CommentCount++
+		m.Mysql.Save(&vm)
 		return model, nil
 	}
 }
@@ -154,5 +158,9 @@ func (m *mysqlInteractRepository) DeleteCommentById(user_id int64, comment_id in
 	if ret.Error != nil {
 		return model, errors.New("删除失败！")
 	}
+	var vm domain.VideoModel
+	m.Mysql.First(&vm, model.VideoID)
+	vm.CommentCount--
+	m.Mysql.Save(&vm)
 	return model, nil
 }
