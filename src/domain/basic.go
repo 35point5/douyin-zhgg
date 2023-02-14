@@ -180,7 +180,7 @@ type InteractRepository interface {
 type InteractUsecase interface {
 	GetFavoriteListByUserId(id int64) ([]Video, error)
 	FavoriteActionByUserId(user_id int64, video_id int64, action_type int32) (bool, error)
-	GetCommentListByVideoId(video_id int64) ([]Comment, error)
+	GetCommentListByVideoId(video_id int64, user_id int64) ([]Comment, error)
 	CommentAction(user_id int64, video_id int64, content string, comment_id int64, action_type int) (Comment, error)
 }
 

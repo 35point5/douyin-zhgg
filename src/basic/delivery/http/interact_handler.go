@@ -115,7 +115,8 @@ func (t *InteractHandler) GetCommentByVideoId(ctx context.Context, c *app.Reques
 		})
 		return
 	}
-	comments, err := t.IUsecase.GetCommentListByVideoId(request.VideoId)
+	uid, _ := c.Get("uid")
+	comments, err := t.IUsecase.GetCommentListByVideoId(request.VideoId, uid.(int64))
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusOK, domain.Response{

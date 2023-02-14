@@ -56,7 +56,7 @@ func (u *interactUsecase) FavoriteActionByUserId(user_id int64, video_id int64, 
 	return u.interactRepo.FavoriteActionByUserId(user_id, video_id, action_type)
 }
 
-func (u *interactUsecase) GetCommentListByVideoId(video_id int64) ([]domain.Comment, error) {
+func (u *interactUsecase) GetCommentListByVideoId(video_id int64, user_id int64) ([]domain.Comment, error) {
 	models, err := u.interactRepo.GetCommentListByVideoId(video_id)
 	if err != nil {
 		return nil, err
@@ -72,6 +72,7 @@ func (u *interactUsecase) GetCommentListByVideoId(video_id int64) ([]domain.Comm
 			Name:          user_model.Name,
 			FollowCount:   user_model.FollowCount,
 			FollowerCount: user_model.FollowerCount,
+			IsFollow:      u.basicRepo.IsFollow(user_id, user_model.Id),
 		}
 		comment := domain.Comment{
 			Id:         c.ID,
