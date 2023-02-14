@@ -57,7 +57,7 @@ func (t *BasicHandler) GetVideoByTime(ctx context.Context, c *app.RequestContext
 		uid, _ = strconv.ParseInt(claims["uid"].(string), 10, 64)
 		log.Println("feed uid:", uid)
 	}
-	videos, lastTime := t.BUsecase.GetVideoByTime(time.Unix(r.LatestTime/1000+1, 0), uid)
+	videos, lastTime := t.BUsecase.GetVideoByTime(time.Unix(r.LatestTime/1000, 0), uid)
 	fmt.Println(videos)
 	c.JSON(http.StatusOK, domain.FeedResponse{
 		Response: domain.Response{

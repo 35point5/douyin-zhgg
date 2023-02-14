@@ -31,10 +31,10 @@ func NewMysqlBasicRepository(conn *gorm.DB, debug bool) domain.BasicRepository {
 		conn.Create(&domain.UserModel{Id: 4, Name: "user4", Password: "123456", FollowCount: 1, FollowerCount: 0})
 
 		conn.Create(&domain.VideoModel{Id: 1, Uid: 1, PlayUrl: domainName + staticURL + "/bear.mp4",
-			CoverUrl: domainName + staticURL + "/cover.jpg", FavoriteCount: 3, CommentCount: 2, Title: "video1", UpdatedTime: time.Now(),
+			CoverUrl: domainName + staticURL + "/cover.jpg", FavoriteCount: 3, CommentCount: 2, Title: "video1", UpdatedTime: time.Now().Add(-2 * time.Hour),
 		})
 		conn.Create(&domain.VideoModel{Id: 2, Uid: 2, PlayUrl: domainName + staticURL + "/song1.mp4",
-			CoverUrl: domainName + staticURL + "/song1.jpg", FavoriteCount: 1, CommentCount: 1, Title: "video2", UpdatedTime: time.Now(),
+			CoverUrl: domainName + staticURL + "/song1.jpg", FavoriteCount: 1, CommentCount: 1, Title: "video2", UpdatedTime: time.Now().Add(-time.Hour),
 		})
 		conn.Create(&domain.VideoModel{Id: 3, Uid: 2, PlayUrl: domainName + staticURL + "/song2.mp4",
 			CoverUrl: domainName + staticURL + "/song2.jpg", FavoriteCount: 0, CommentCount: 0, Title: "video3", UpdatedTime: time.Now(),
@@ -46,7 +46,7 @@ func NewMysqlBasicRepository(conn *gorm.DB, debug bool) domain.BasicRepository {
 func (m *mysqlBasicRepository) GetVideoByTime(t time.Time) []domain.VideoModel {
 	var res []domain.VideoModel
 	videoCount := viper.GetInt("video_limit")
-	m.Mysql.Where("updated_time <= ?", t).Order("updated_time desc").Limit(videoCount).Find(&res)
+	m.Mysql.Where("updated_time < ?", t).Order("updated_time desc").Limit(videoCount).Find(&res)
 	return res
 }
 
