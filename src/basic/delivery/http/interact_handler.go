@@ -147,7 +147,8 @@ func (t *InteractHandler) CommentAction(ctx context.Context, c *app.RequestConte
 		})
 		return
 	}
-	comment, err := t.IUsecase.CommentAction(0, request.VideoId, request.CommentText, request.CommentId, request.ActionType)
+	uid, _ := c.Get("uid")
+	comment, err := t.IUsecase.CommentAction(uid.(int64), request.VideoId, request.CommentText, request.CommentId, request.ActionType)
 	fmt.Println(comment)
 	if err != nil {
 		c.JSON(http.StatusOK, domain.CommentActionResponse{
