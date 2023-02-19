@@ -7,13 +7,14 @@ import (
 	_basicRepo "douyin-service/basic/repository/mysql"
 	_basicUC "douyin-service/basic/usecase"
 	"fmt"
+	"log"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"log"
 )
 
 var debug bool

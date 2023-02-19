@@ -5,13 +5,14 @@ import (
 	"douyin-service/basic/delivery/http/middleware"
 	"douyin-service/domain"
 	"fmt"
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/app/server"
-	"github.com/cloudwego/hertz/pkg/common/utils"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/common/utils"
 )
 
 type BasicHandler struct {
@@ -56,6 +57,9 @@ func (t *BasicHandler) GetVideoByTime(ctx context.Context, c *app.RequestContext
 	if err == nil {
 		uid, _ = strconv.ParseInt(claims["uid"].(string), 10, 64)
 		log.Println("feed uid:", uid)
+	}
+	if r.LatestTime == 0 {
+		r.LatestTime = time.Now().UnixMilli()
 	}
 	videos, lastTime := t.BUsecase.GetVideoByTime(time.Unix(r.LatestTime/1000, 0), uid)
 	fmt.Println(videos)

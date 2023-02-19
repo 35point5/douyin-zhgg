@@ -59,8 +59,7 @@ func (m *mysqlInteractRepository) GetFavoriteListByUserId(id int64) ([]domain.Fa
 	} else if judgeRes.Error != nil {
 		return res, judgeRes.Error
 	}
-	videoCount := viper.GetInt("video_limit")
-	judgeRes = m.Mysql.Where("user_id = ?", id).Limit(videoCount).Find(&res)
+	judgeRes = m.Mysql.Where("user_id = ?", id).Find(&res)
 	if errors.Is(judgeRes.Error, gorm.ErrRecordNotFound) {
 		return res, errors.New("favorite list is null !")
 	} else if judgeRes.Error != nil {
