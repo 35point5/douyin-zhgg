@@ -14,7 +14,6 @@ import (
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var debug bool
@@ -34,9 +33,7 @@ func main() {
 	dbName := viper.GetString(`database.name`)
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?&parseTime=true", dbUser, dbPass, dbHost, dbPort, dbName)
 	fmt.Println(dsn)
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
+	db, err := gorm.Open(mysql.Open(dsn))
 	if err != nil {
 		panic(err)
 	}

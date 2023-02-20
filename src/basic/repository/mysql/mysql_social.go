@@ -78,7 +78,7 @@ func (m *mysqlSocialRepository) GetFriendListByUserId(id int64) ([]domain.Follow
 	if errors.Is(judgeRes.Error, gorm.ErrRecordNotFound) {
 		return res, errors.New("user id is not exist!")
 	}
-	judgeRes = m.Mysql.Where("user_id = ? AND status != 2", id).Find(&res)
+	judgeRes = m.Mysql.Where("user_id = ? AND status != 1", id).Find(&res)
 	if errors.Is(judgeRes.Error, gorm.ErrRecordNotFound) {
 		return res, errors.New("follow list is null!")
 	} else if judgeRes.Error != nil {

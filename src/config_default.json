@@ -1,0 +1,16 @@
+{
+  "debug": true,
+  "video_limit": 2,
+  "domain": "http://127.0.0.1:1897",
+  "static_url": "/douyin/static/",
+  "static_path": "./public",
+  "listen": "0.0.0.0:1897",
+  "jwt_key": "AFD7AFB98401482286B5DDC749F1CDAB",
+  "database": {
+    "host": "mysql",
+    "port": "3306",
+    "user": "root",
+    "pass": "123456",
+    "name": "douyin"
+  }
+}

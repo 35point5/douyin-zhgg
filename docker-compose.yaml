@@ -1,14 +1,40 @@
 version: '3'
 services:
-#  service:
-##    restart: always
-#    build: .
-#    container_name: douyin-service
-#    depends_on:
-#      mysql:
-#        condition: service_healthy
-#    ports:
-#      - "1897:1897"
+  nginx:
+    image: nginx:stable-alpine-perl
+    container_name: nginx
+    restart: always
+    ports:
+      - "1897:80"
+    volumes:
+    - ./nginx.conf:/etc/nginx/nginx.conf
+  service0:
+   build: .
+   image: douyin-service
+   container_name: douyin-service-container0
+   depends_on:
+     mysql:
+       condition: service_healthy
+  #  ports:
+  #    - "8080:8080"
+  service1:
+   build: .
+   image: douyin-service
+   container_name: douyin-service-container1
+   depends_on:
+     mysql:
+       condition: service_healthy
+  #  ports:
+  #    - "8081:8081"
+  service2:
+   build: .
+   image: douyin-service
+   container_name: douyin-service-container2
+   depends_on:
+     mysql:
+       condition: service_healthy
+  #  ports:
+  #    - "8082:8082"
   mysql:
     restart: unless-stopped
     image: mysql:8.0.27
@@ -21,20 +47,10 @@ services:
       - "MYSQL_DATABASE=douyin"
       - "TZ=Asia/Shanghai"
     command: --default-authentication-plugin=mysql_native_password
-    ports:
-      - "3306:3306"
+    # ports:
+      # - "3306:3306"
     healthcheck:
       test: "mysqladmin ping -h localhost"
       timeout: 1s
       retries: 20
       interval: 1s
-  redis:
-    image: 'redis:6.0'
-    restart: always
-    container_name: docker_redis
-    volumes:
-      - ./redis.conf:/usr/local/etc/redis/redis.conf
-    command:
-      redis-server /usr/local/etc/redis/redis.conf
-    ports:
-      - "6379:6379"

@@ -68,7 +68,7 @@ func (u *socialUsecase) GetFriendListByUserId(id int64) ([]domain.User, error) {
 	}
 	var uids []int64
 	for _, fl := range fls {
-		uids = append(uids, fl.UserID)
+		uids = append(uids, fl.ToUserID)
 	}
 
 	var res []domain.User
